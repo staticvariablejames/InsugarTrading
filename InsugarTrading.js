@@ -4,8 +4,9 @@ if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieC
 // CCSE calls Game.Win('Third-party') for us
 
 InsugarTrading.minigame = null; // Set to Game.Objects['Bank'].minigame on InsugarTrading.launch()
-InsugarTrading.isGatheringData = false;
+InsugarTrading.isGatheringData = false; // Set to false when the data collection is to stop
 InsugarTrading.tickCount = 0;
+InsugarTrading.tickTarget = Infinity; // If tickCount >= tickTarget, isGatheringData is set to false
 
 /* InsugarTrading.data is initialized by InsugarTrading.startDataCollection().
  * The data here is just a histogram:
@@ -66,10 +67,14 @@ InsugarTrading.customTick = function() {
         value = Math.floor(10*value);
         InsugarTrading.data[id][value]++;
     }
+
     InsugarTrading.tickCount++;
+    if(InsugarTrading.tickCount >= InsugarTrading.tickTarget) {
+        InsugarTrading.isGatheringData = false;
+    }
 }
 
-InsugarTrading.startDataCollection = function() {
+InsugarTrading.collectData = function(tickTarget) {
     InsugarTrading.data = new Array(InsugarTrading.minigame.goodsById.length);
     for(let id = 0; id < InsugarTrading.data.length; id++) {
         InsugarTrading.data[id] = new Array(3000);
@@ -78,6 +83,7 @@ InsugarTrading.startDataCollection = function() {
     }
 
     InsugarTrading.tickCount = 0;
+    InsugarTrading.tickTarget = tickTarget;
     InsugarTrading.isGatheringData = true;
     InsugarTrading.fastTicker.start();
 }
