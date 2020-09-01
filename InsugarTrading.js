@@ -9,29 +9,29 @@ InsugarTrading.tickCount = 0;
 
 /* InsugarTrading.data is initialized by InsugarTrading.startDataCollection().
  * The data here is just a histogram:
- * data[i][j] is the number of times that the i-th stock
+ * data[id][value] is the number of times that the id-th stock
  * (as listed by Game.Objects['Bank'].goodsById)
- * had its price between j/10 (inclusive) and j/10+1 (exclusive).
+ * had its price between value/10 (inclusive) and value/10+1 (exclusive).
  * So this histogram goes in 10-cents increments.
  */
 InsugarTrading.data = null;
 
 InsugarTrading.customTick = function() {
     if(!InsugarTrading.isGatheringData) return;
-    for(let i = 0; i < InsugarTrading.data.length; i++) {
-        let value = InsugarTrading.minigame.goodsById[i].val;
+    for(let id = 0; id < InsugarTrading.data.length; id++) {
+        let value = InsugarTrading.minigame.goodsById[id].val;
         value = Math.floor(10*value);
-        InsugarTrading.data[i][value]++;
+        InsugarTrading.data[id][value]++;
     }
     InsugarTrading.tickCount++;
 }
 
 InsugarTrading.startDataCollection = function() {
     InsugarTrading.data = new Array(InsugarTrading.minigame.goodsById.length);
-    for(let i = 0; i < InsugarTrading.data.length; i++) {
-        InsugarTrading.data[i] = new Array(3000);
-        for(let j = 0; j < InsugarTrading.data[i].length; j++)
-            InsugarTrading.data[i][j] = 0;
+    for(let id = 0; id < InsugarTrading.data.length; id++) {
+        InsugarTrading.data[id] = new Array(3000);
+        for(let value = 0; value < InsugarTrading.data[id].length; value++)
+            InsugarTrading.data[id][value] = 0;
     }
 
     InsugarTrading.tickCount = 0;
