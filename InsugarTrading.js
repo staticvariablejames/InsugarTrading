@@ -37,12 +37,18 @@ InsugarTrading.fastTicker.start = function() {
 InsugarTrading.fastTicker.tickSeveralTimes = function() {
     let beginTime = Date.now();
     for(let i = 0; i < this.ticksPerCall; i++) {
-        if(!InsugarTrading.isGatheringData) this.stop();
+        if(!InsugarTrading.isGatheringData) {
+            this.stop();
+            return;
+        }
         InsugarTrading.minigame.tick();
     }
     let endTime = Date.now();
     if(endTime - beginTime < 800) { // less than 800ms
         this.ticksPerCall *= 1.2; // speed up
+        /* I don't know how fast my computer can tick the minigame.
+         * This is a simple way of maximizing for speed without guessing.
+         */
     }
 }
 InsugarTrading.fastTicker.stop = function() {
