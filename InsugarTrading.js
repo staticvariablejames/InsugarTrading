@@ -88,6 +88,17 @@ InsugarTrading.collectData = function(tickTarget) {
     InsugarTrading.fastTicker.start();
 }
 
+InsugarTrading.datasetToString = function() {
+    // Essentially prints InsugarTradingData.js.
+    let str = '// Precomputed dataset for InsugarTrading\n';
+    str += 'InsugarTrading.tickCount = ' + InsugarTrading.tickCount + ';\n';
+    str += 'InsugarTrading.data = new Array(' + InsugarTrading.data.length + ');\n';
+    for(let i = 0; i < InsugarTrading.data.length; i++) {
+        str += 'InsugarTrading.data[' + i + '] = [' + InsugarTrading.data[i].join(',') + '];\n';
+    }
+    return str;
+}
+
 InsugarTrading.launch = function() {
     CCSE.MinigameReplacer(function(){
         InsugarTrading.minigame = Game.Objects['Bank'].minigame;
