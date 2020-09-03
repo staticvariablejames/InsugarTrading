@@ -145,7 +145,7 @@ InsugarTrading.fastTicker.stop = function() {
 }
 
 /* InsugarTrading.launch() makes sure this function runs every time the stock market ticks. */
-InsugarTrading.customTick = function() {
+InsugarTrading.customTickCollectData = function() {
     if(!InsugarTrading.isGatheringData) return;
     for(let id = 0; id < InsugarTrading.data.length; id++) {
         let value = InsugarTrading.minigame.goodsById[id].val;
@@ -197,7 +197,25 @@ InsugarTrading.createQuantileRows = function() {
         }
 
         quantileDiv.innerHTML = 'Quantile: <div id="quantile-' + i + '" ' +
-            'style="display:inline">unknown</div>';
+            'style="display:inline">no data</div>';
+    }
+}
+
+InsugarTrading.customTickDisplayData = function() {
+    if(InsugarTrading.isGatheringData) return;
+    for(let i = 0; i < InsugarTrading.minigame.goodsById.length; i++) {
+        let div = document.getElementById('quantile-' + i);
+        if(InsugarTrading.data === null) {
+            div.innerHTML = 'no data';
+            div.style.color = '';
+            div.style.fontWeight = '';
+        } else {
+            let value = InsugarTrading.minigame.goodsById[i].val;
+            let q = InsugarTrading.inverseQuantile(i, value);
+            div.innerHTML = (Math.floor(10000*q)/100) + '%';
+            div.style.color = 'cyan';
+            div.style.fontWeight = 'bold';
+        }
     }
 }
 
@@ -205,7 +223,10 @@ InsugarTrading.launch = function() {
     CCSE.MinigameReplacer(function(){
         InsugarTrading.minigame = Game.Objects['Bank'].minigame;
         InsugarTrading.createQuantileRows();
-        Game.customMinigame['Bank'].tick.push(InsugarTrading.customTick);
+        Game.customMinigame['Bank'].tick.push(function() {
+            InsugarTrading.customTickCollectData();
+            InsugarTrading.customTickDisplayData();
+        });
     },'Bank');
 }
 
