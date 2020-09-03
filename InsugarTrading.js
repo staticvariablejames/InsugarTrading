@@ -41,6 +41,25 @@ InsugarTrading.computePartialSums = function() {
     }
 }
 
+/* Returns the proportion of values in the histogram for goodId
+ * which are smaller than the given value.
+ * The result is a value between 0 and 1 (inclusive).
+ * A linear approximation is used inside each bin of the histogram.
+ *
+ * This function queries InsugarTrading.partialSums. */
+InsugarTrading.inverseQuantile = function(goodId, targetValue) {
+    InsugarTrading.computePartialSums();
+    let value = 10 * targetValue; // The histogram works in increments of 0.1
+    if(value <= 0) return 0;
+    if(value >= InsugarTrading.data[goodId].length) return 1;
+
+    let knownToBeSmaller = InsugarTrading.partialSums[goodId][Math.floor(value)];
+    let fraction = value - Math.floor(value);
+    // linear approximation inside the bin number Math.floor(value)
+    let estimatedToBeSmaller = fraction * InsugarTrading.data[goodId][Math.floor(value)];
+    return (knownToBeSmaller + estimatedToBeSmaller)/InsugarTrading.tickCount;
+}
+
 /* Makeshift tool to tick the stock market more often than what the game could normally do.
  * The fast ticker kills itself once InsugarTrading.isGatheringData is set to false.
  */

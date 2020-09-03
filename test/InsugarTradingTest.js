@@ -2,6 +2,10 @@
 
 console.log("Running tests...");
 
+let almostEqual = function(a, b) {
+    return Math.abs(a-b) < 1e-10;
+}
+
 // Testing dataset
 InsugarTrading.tickCount = 20;
 InsugarTrading.data = [
@@ -33,5 +37,21 @@ console.assert(InsugarTrading.partialSums !== null);
 console.assert(InsugarTrading.partialSums.length === 16);
 console.assert(InsugarTrading.partialSums[0].length === 13);
 console.assert(InsugarTrading.partialSums[0].join(',') === "0,0,1,3,6,10,14,17,19,20,20,20,20");
+
+console.assert(InsugarTrading.inverseQuantile(0, -1) === 0);
+console.assert(InsugarTrading.inverseQuantile(0, 0) === 0);
+console.assert(InsugarTrading.inverseQuantile(0, 1.21) === 1);
+console.assert(almostEqual(InsugarTrading.inverseQuantile(0, 0.1), 0));
+console.assert(almostEqual(InsugarTrading.inverseQuantile(0, 0.15), 0.025));
+console.assert(almostEqual(InsugarTrading.inverseQuantile(0, 0.175), 0.0375));
+console.assert(almostEqual(InsugarTrading.inverseQuantile(0, 0.2), 0.05));
+console.assert(almostEqual(InsugarTrading.inverseQuantile(0, 0.25), 0.10));
+console.assert(almostEqual(InsugarTrading.inverseQuantile(0, 0.3), 0.15));
+console.assert(almostEqual(InsugarTrading.inverseQuantile(0, 0.4), 0.3));
+console.assert(almostEqual(InsugarTrading.inverseQuantile(0, 0.5), 0.5));
+console.assert(almostEqual(InsugarTrading.inverseQuantile(0, 0.55), 0.6));
+console.assert(almostEqual(InsugarTrading.inverseQuantile(0, 0.6), 0.7));
+console.assert(almostEqual(InsugarTrading.inverseQuantile(0, 1.0), 1));
+console.assert(almostEqual(InsugarTrading.inverseQuantile(0, 1.2), 1));
 
 console.log("Testing done!");
