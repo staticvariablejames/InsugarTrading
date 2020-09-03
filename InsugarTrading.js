@@ -17,6 +17,30 @@ InsugarTrading.tickTarget = Infinity; // If tickCount >= tickTarget, isGathering
  */
 InsugarTrading.data = null;
 
+/* InsugarTrading.partialSums[id] contains the partial sums of InsugarTrading.data[id].
+ * More specifically, InsugarTrading.partialSums[id][value]
+ * is the sum of InsugarTrading.partialSums[id][v] for v = 0,...,value-1.
+ * So, for example,
+ * InsugarTrading.partialSums[id].length === InsugarTrading.data[id].length + 1,
+ * and the last value of InsugarTrading.partialSums[id] equals InsugarTrading.tickCount.
+ *
+ * It is computed by InsugarTrading.computePartialSums,
+ * unless the data is unavailable or the partial sums are already computed.
+ */
+InsugarTrading.partialSums = null;
+InsugarTrading.computePartialSums = function() {
+    if(InsugarTrading.data === null || InsugarTrading.partialSums !== null) return;
+    InsugarTrading.partialSums = new Array(InsugarTrading.data.length);
+    for(let id = 0; id < InsugarTrading.data.length; id++) {
+        InsugarTrading.partialSums[id] = new Array(InsugarTrading.data[id].length + 1);
+        InsugarTrading.partialSums[id][0] = 0;
+        for(let v = 0; v < InsugarTrading.data[id].length; v++) {
+            InsugarTrading.partialSums[id][v+1] = InsugarTrading.partialSums[id][v] +
+                    InsugarTrading.data[id][v];
+        }
+    }
+}
+
 /* Makeshift tool to tick the stock market more often than what the game could normally do.
  * The fast ticker kills itself once InsugarTrading.isGatheringData is set to false.
  */
