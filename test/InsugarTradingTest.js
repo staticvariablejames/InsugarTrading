@@ -38,6 +38,20 @@ console.assert(InsugarTrading.partialSums.length === 16);
 console.assert(InsugarTrading.partialSums[0].length === 13);
 console.assert(InsugarTrading.partialSums[0].join(',') === "0,0,1,3,6,10,14,17,19,20,20,20,20");
 
+console.assert(InsugarTrading.quantile(0, -1) === -Infinity);
+console.assert(InsugarTrading.quantile(0, 1.01) === Infinity);
+console.assert(almostEqual(InsugarTrading.quantile(0, 0), 0.1));
+console.assert(almostEqual(InsugarTrading.quantile(0, 0.025), 0.15));
+console.assert(almostEqual(InsugarTrading.quantile(0, 0.0375), 0.175));
+console.assert(almostEqual(InsugarTrading.quantile(0, 0.05), 0.2));
+console.assert(almostEqual(InsugarTrading.quantile(0, 0.10), 0.25));
+console.assert(almostEqual(InsugarTrading.quantile(0, 0.15), 0.3));
+console.assert(almostEqual(InsugarTrading.quantile(0, 0.3), 0.4));
+console.assert(almostEqual(InsugarTrading.quantile(0, 0.5), 0.5));
+console.assert(almostEqual(InsugarTrading.quantile(0, 0.6), 0.55));
+console.assert(almostEqual(InsugarTrading.quantile(0, 0.7), 0.6));
+console.assert(almostEqual(InsugarTrading.quantile(0, 1), 1.2));
+
 console.assert(InsugarTrading.inverseQuantile(0, -1) === 0);
 console.assert(InsugarTrading.inverseQuantile(0, 0) === 0);
 console.assert(InsugarTrading.inverseQuantile(0, 1.21) === 1);

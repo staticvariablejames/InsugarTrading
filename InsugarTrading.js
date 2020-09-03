@@ -41,6 +41,48 @@ InsugarTrading.computePartialSums = function() {
     }
 }
 
+/* Returns a value such that the given fraction of the values in the histogram are smaller than it
+ * and 1-fraction of the values in the histogram are higher than it.
+ * A linear approximation is used inside each bin of the histogram.
+ *
+ * If more than one value is valid, the largest one is returned.
+ *
+ * This function queries InsugarTrading.partialSums.
+ */
+InsugarTrading.quantile = function(goodId, fraction) {
+    InsugarTrading.computePartialSums();
+    if(fraction < 0) return -Infinity;
+    if(fraction > 1) return Infinity;
+
+    // Binary search, Hermann Bottenbruch version
+    let a = InsugarTrading.partialSums[goodId];
+    let i = 0, j = InsugarTrading.data[goodId].length; // i is a lower bound, j is an upper bound
+    let target = fraction * InsugarTrading.tickCount;
+    while(i !== j) {
+        // Invariant: if k is the largest index such that a[k] <= target, then i <= k <= j.
+        let middle = Math.ceil((i+j)/2);
+        if(a[middle] > target) {
+            j = middle - 1;
+        } else {
+            i = middle;
+        }
+    }
+    // At the end of the loop, i is the largest index such that a[i] <= target.
+
+    let knownQuantile = i/10;
+    // Linear approximation:
+    let excess = target - a[i]; // How much we need to take into account for the approximation
+    let estimatedQuantile = 0;
+    if(excess > 0) {
+        estimatedQuantile += excess/InsugarTrading.data[goodId][i]/10;
+        /* This 'if' prevents a possible division by zero if InsugarTrading.data[goodId][i] === 0
+         * It also can never execute if i === InsugarTrading.data[goodId].length,
+         * because this would force excess to be 0.
+         */
+    }
+    return knownQuantile + estimatedQuantile;
+}
+
 /* Returns the proportion of values in the histogram for goodId
  * which are smaller than the given value.
  * The result is a value between 0 and 1 (inclusive).
