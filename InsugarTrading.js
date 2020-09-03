@@ -184,9 +184,27 @@ InsugarTrading.datasetToString = function() {
     return str;
 }
 
+// Creates a new row in each of the good-displaying boxes, right above the stock count
+InsugarTrading.createQuantileRows = function() {
+    for(let i = 0; i < InsugarTrading.minigame.goodsById.length; i++) {
+        let upperBox = document.getElementById('bankGood-' + i).firstChild;
+        let stockCounterDiv = document.getElementById('bankGood-' + i + '-stockBox');
+        let quantileDiv = upperBox.insertBefore(document.createElement("div"), stockCounterDiv);
+
+        // Copy the style from the other div, because assigning quantileDiv.style don't work
+        for(let key in stockCounterDiv.style) {
+            quantileDiv.style[key] = stockCounterDiv.style[key];
+        }
+
+        quantileDiv.innerHTML = 'Quantile: <div id="quantile-' + i + '" ' +
+            'style="display:inline">unknown</div>';
+    }
+}
+
 InsugarTrading.launch = function() {
     CCSE.MinigameReplacer(function(){
         InsugarTrading.minigame = Game.Objects['Bank'].minigame;
+        InsugarTrading.createQuantileRows();
         Game.customMinigame['Bank'].tick.push(InsugarTrading.customTick);
     },'Bank');
 }
