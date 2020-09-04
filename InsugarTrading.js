@@ -184,7 +184,11 @@ InsugarTrading.datasetToString = function() {
     return str;
 }
 
-// Creates a new row in each of the good-displaying boxes, right above the stock count
+/* Creates a new row in each of the good-displaying boxes, right above the stock count.
+ * Each box has the text "Quantile: " followed by a div with id 'quantile-0', 'quantile-1' etc.
+ * Since this method is called precisely once after the minigame loads,
+ * the ids are reliable and are used e.g. by updateQuantileText.
+ */
 InsugarTrading.createQuantileRows = function() {
     for(let i = 0; i < InsugarTrading.minigame.goodsById.length; i++) {
         let upperBox = document.getElementById('bankGood-' + i).firstChild;
@@ -198,6 +202,7 @@ InsugarTrading.createQuantileRows = function() {
 
         quantileDiv.innerHTML = 'Quantile: <div id="quantile-' + i + '" ' +
             'style="display:inline">no data</div>';
+        InsugarTrading.updateQuantileText(i);
     }
 }
 
@@ -211,30 +216,37 @@ InsugarTrading.interestingness = function(stockQuantile, purchasedPercent) {
     return purchasedPercent * stockQuantile + (1-purchasedPercent) * (1 - stockQuantile);
 }
 
+/* Updates the text inside the row created by InsugarTrading.createQuantileRows.
+ * The signature is appropriate for Game.customMinigame.Bank.buyGood and sellGood.
+ */
+InsugarTrading.updateQuantileText = function(id) {
+    let div = document.getElementById('quantile-' + id);
+    if(InsugarTrading.data === null) {
+        div.innerHTML = 'no data';
+        div.style.color = '';
+        div.style.fontWeight = '';
+    } else {
+        let good = InsugarTrading.minigame.goodsById[id];
+        let value = good.val;
+        let ownPercentage = good.stock / InsugarTrading.minigame.getGoodMaxStock(good);
+        let q = InsugarTrading.inverseQuantile(i, value);
+        div.innerHTML = (Math.floor(10000*q)/100) + '%';
+
+        let intr = InsugarTrading.interestingness(q, ownPercentage);
+        div.style.fontWeight = (intr > 0.5 ? 'bold' : '');
+
+        // Makeshift color interpolation from gray to orange
+        div.style.color = 'rgba(255, ' + // red
+                (165+(1-intr)*90) + ', ' + // green
+                ((1-intr)*255) + ', ' + // blue
+                (0.7 + 0.3*intr) + ')'; // alpha
+    }
+}
+
 InsugarTrading.customTickDisplayData = function() {
     if(InsugarTrading.isGatheringData) return;
     for(let i = 0; i < InsugarTrading.minigame.goodsById.length; i++) {
-        let div = document.getElementById('quantile-' + i);
-        if(InsugarTrading.data === null) {
-            div.innerHTML = 'no data';
-            div.style.color = '';
-            div.style.fontWeight = '';
-        } else {
-            let good = InsugarTrading.minigame.goodsById[i];
-            let value = good.val;
-            let ownPercentage = good.stock / InsugarTrading.minigame.getGoodMaxStock(good);
-            let q = InsugarTrading.inverseQuantile(i, value);
-            div.innerHTML = (Math.floor(10000*q)/100) + '%';
-
-            let intr = InsugarTrading.interestingness(q, ownPercentage);
-            div.style.fontWeight = (intr > 0.5 ? 'bold' : '');
-
-            // Makeshift color interpolation from gray to orange
-            div.style.color = 'rgba(255, ' + // red
-                    (165+(1-intr)*90) + ', ' + // green
-                    ((1-intr)*255) + ', ' + // blue
-                    (0.7 + 0.3*intr) + ')'; // alpha
-        }
+        InsugarTrading.updateQuantileText(i);
     }
 }
 
@@ -246,6 +258,8 @@ InsugarTrading.launch = function() {
             InsugarTrading.customTickCollectData();
             InsugarTrading.customTickDisplayData();
         });
+        Game.customMinigame['Bank'].buyGood.push(InsugarTrading.updateQuantileText);
+        Game.customMinigame['Bank'].sellGood.push(InsugarTrading.updateQuantileText);
     },'Bank');
 }
 
