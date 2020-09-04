@@ -201,6 +201,16 @@ InsugarTrading.createQuantileRows = function() {
     }
 }
 
+/* An estimator for the interestingness of the given stock
+ * (i.e. how much attention should be paid to that stock).
+ * 0 is not interesting at all; happens if you have none of that expensive stock,
+ *  or all of that cheap stock.
+ * 1 is very interesting, and happens if either you have none and the stock is very cheap,
+ *  or if you have a lot of that stock and is very expensive. */
+InsugarTrading.interestingness = function(stockQuantile, purchasedPercent) {
+    return purchasedPercent * stockQuantile + (1-purchasedPercent) * (1 - stockQuantile);
+}
+
 InsugarTrading.customTickDisplayData = function() {
     if(InsugarTrading.isGatheringData) return;
     for(let i = 0; i < InsugarTrading.minigame.goodsById.length; i++) {
@@ -210,11 +220,20 @@ InsugarTrading.customTickDisplayData = function() {
             div.style.color = '';
             div.style.fontWeight = '';
         } else {
-            let value = InsugarTrading.minigame.goodsById[i].val;
+            let good = InsugarTrading.minigame.goodsById[i];
+            let value = good.val;
+            let ownPercentage = good.stock / InsugarTrading.minigame.getGoodMaxStock(good);
             let q = InsugarTrading.inverseQuantile(i, value);
             div.innerHTML = (Math.floor(10000*q)/100) + '%';
-            div.style.color = 'cyan';
-            div.style.fontWeight = 'bold';
+
+            let intr = InsugarTrading.interestingness(q, ownPercentage);
+            div.style.fontWeight = (intr > 0.5 ? 'bold' : '');
+
+            // Makeshift color interpolation from gray to orange
+            div.style.color = 'rgba(255, ' + // red
+                    (165+(1-intr)*90) + ', ' + // green
+                    ((1-intr)*255) + ', ' + // blue
+                    (0.7 + 0.3*intr) + ')'; // alpha
         }
     }
 }
