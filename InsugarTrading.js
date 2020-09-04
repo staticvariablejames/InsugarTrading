@@ -269,7 +269,7 @@ InsugarTrading.updateQuantileText = function(id) {
         let good = InsugarTrading.minigame.goodsById[id];
         let value = good.val;
         let ownPercentage = good.stock / InsugarTrading.minigame.getGoodMaxStock(good);
-        let q = InsugarTrading.inverseQuantile(i, value);
+        let q = InsugarTrading.inverseQuantile(id, value);
         div.innerHTML = (Math.floor(10000*q)/100) + '%';
 
         let intr = InsugarTrading.interestingness(q, ownPercentage);
