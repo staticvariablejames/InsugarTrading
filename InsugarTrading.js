@@ -211,7 +211,7 @@ InsugarTrading.SVGhistogram = function(goodId, currentPrice) {
     // Draw the histogram
     str += '<path d="M 0 ' + height + ' ';
     for(let i = 0; i < 10*upperPriceBound; i++) {
-        if(i > 0) str += 'h ' + (height/10/upperPriceBound) + ' ';
+        if(i > 0) str += 'h ' + (width/10/upperPriceBound) + ' ';
         str += 'V ' + (height - InsugarTrading.data[goodId][i]/upperDensityBound*height) + ' ';
     }
     str += ' Z" fill="cyan" />';
