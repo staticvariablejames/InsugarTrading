@@ -159,6 +159,8 @@ InsugarTrading.customTickCollectData = function() {
     }
 }
 
+/* Sets up and runs through a sequence of data collection ticks.
+ */
 InsugarTrading.collectData = function(tickTarget) {
     InsugarTrading.data = new Array(InsugarTrading.minigame.goodsById.length);
     for(let id = 0; id < InsugarTrading.data.length; id++) {
@@ -182,6 +184,20 @@ InsugarTrading.datasetToString = function() {
         str += 'InsugarTrading.data[' + i + '] = [' + InsugarTrading.data[i].join(',') + '];\n';
     }
     return str;
+}
+
+/* Computes the average price for the given good in the dataset.
+ *
+ * A linear approximation is used inside each bin.
+ */
+InsugarTrading.averagePrice = function(goodId) {
+    let sum = 0;
+    let observations = 0;
+    for(let i = 0; i < InsugarTrading.data[goodId].length; i++) {
+        sum += (i/10+0.05) * InsugarTrading.data[goodId][i];
+        observations += InsugarTrading.data[goodId][i];
+    }
+    return sum/observations;
 }
 
 /* Creates a new row in each of the good-displaying boxes, right above the stock count.
