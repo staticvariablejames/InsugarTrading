@@ -200,6 +200,30 @@ InsugarTrading.averagePrice = function(goodId) {
     return sum/observations;
 }
 
+/* Constructs a string containing the SVG code for a histogram for the given good.
+ */
+InsugarTrading.SVGhistogram = function(goodId, currentPrice) {
+    let width = 350, height = 250;
+    let str = `<svg width="${width}px" height="${height}px">`;
+    let upperPriceBound = 200;
+    let upperDensityBound = 5000000; // TODO: add proper computation methods
+
+    // Draw the histogram
+    str += '<path d="M 0 ' + height + ' ';
+    for(let i = 0; i < 10*upperPriceBound; i++) {
+        if(i > 0) str += 'h ' + (height/10/upperPriceBound) + ' ';
+        str += 'V ' + (height - InsugarTrading.data[goodId][i]/upperDensityBound*height) + ' ';
+    }
+    str += ' Z" fill="cyan" />';
+
+    // Draw an orange line with the current price
+    let x = currentPrice/upperPriceBound * width;
+    str += `<line x1="${x}" y1="0" x2="${x}" y2="${height}" stroke="orange" />`;
+
+    str += '</svg>';
+    return str;
+}
+
 /* Creates a new row in each of the good-displaying boxes, right above the stock count.
  * Each box has the text "Quantile: " followed by a div with id 'quantile-0', 'quantile-1' etc.
  * Since this method is called precisely once after the minigame loads,
@@ -259,6 +283,11 @@ InsugarTrading.updateQuantileText = function(id) {
     }
 }
 
+InsugarTrading.customGoodTooltip = function(id, str) {
+    return str + '<div class="line"></div>' +
+        InsugarTrading.SVGhistogram(id, InsugarTrading.minigame.goodsById[id].val);
+}
+
 InsugarTrading.customTickDisplayData = function() {
     if(InsugarTrading.isGatheringData) return;
     for(let i = 0; i < InsugarTrading.minigame.goodsById.length; i++) {
@@ -276,6 +305,7 @@ InsugarTrading.launch = function() {
         });
         Game.customMinigame['Bank'].buyGood.push(InsugarTrading.updateQuantileText);
         Game.customMinigame['Bank'].sellGood.push(InsugarTrading.updateQuantileText);
+        Game.customMinigame['Bank'].goodTooltip.push(InsugarTrading.customGoodTooltip);
     },'Bank');
 }
 
