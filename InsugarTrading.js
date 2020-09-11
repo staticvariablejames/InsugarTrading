@@ -202,11 +202,11 @@ InsugarTrading.minigame = null; // Set to Game.Objects['Bank'].minigame on Insug
 
 // Utility accessor functions
 InsugarTrading.getBankLevel = function() {
-    return this.minigame.parent.level;
+    return InsugarTrading.minigame.parent.level;
 }
 
 InsugarTrading.getGoodsCount = function() {
-    return this.minigame.goodsById.length;
+    return InsugarTrading.minigame.goodsById.length;
 }
 
 InsugarTrading.isDataAvailable = function(bankLevel, goodId) {
@@ -219,8 +219,8 @@ InsugarTrading.isDataAvailable = function(bankLevel, goodId) {
 
 InsugarTrading.frequency = function(goodId, value) {
     // Returns the data corresponding to the current bank level
-    if(this.data.length > this.getBankLevel())
-        return this.data[this.getBankLevel()][goodId][value];
+    if(InsugarTrading.data.length > InsugarTrading.getBankLevel())
+        return InsugarTrading.data[InsugarTrading.getBankLevel()][goodId][value];
     else
         return null;
 }
@@ -240,7 +240,7 @@ InsugarTrading.customTickCollectData = function() {
     for(let id = 0; id < InsugarTrading.getGoodsCount(); id++) {
         let value = InsugarTrading.minigame.goodsById[id].val;
         value = Math.floor(10*value);
-        InsugarTrading.data[this.getBankLevel()][id][value]++;
+        InsugarTrading.data[InsugarTrading.getBankLevel()][id][value]++;
     }
 
     InsugarTrading.tickCount++;
@@ -294,11 +294,11 @@ InsugarTrading.fastTicker.stop = function() {
 /* Sets up and runs through a sequence of data collection ticks.
  */
 InsugarTrading.collectData = function(tickTarget) {
-    let bl = this.getBankLevel();
+    let bl = InsugarTrading.getBankLevel();
     InsugarTrading.data[bl] = new Array(InsugarTrading.minigame.goodsById.length);
-    for(let id = 0; id < this.getGoodsCount(); id++) {
+    for(let id = 0; id < InsugarTrading.getGoodsCount(); id++) {
         InsugarTrading.data[bl][id] = new Array(3000);
-        for(let value = 0; value < this.getGoodsCount(); value++)
+        for(let value = 0; value < InsugarTrading.getGoodsCount(); value++)
             InsugarTrading.data[bl][id][value] = 0;
     }
 
@@ -404,7 +404,7 @@ InsugarTrading.quantile = function(bankLevel, goodId, fraction) {
 InsugarTrading.inverseQuantile = function(bankLevel, goodId, targetValue) {
     InsugarTrading.computePartialSums();
     let value = 10 * targetValue; // The histogram works in increments of 0.1
-    if(!this.isDataAvailable(bankLevel, goodId)) return null;
+    if(!InsugarTrading.isDataAvailable(bankLevel, goodId)) return null;
     if(value <= 0) return 0;
     if(value >= InsugarTrading.data[bankLevel][goodId].length) return 1;
 
@@ -466,7 +466,7 @@ InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
  * the ids are reliable and are used e.g. by updateQuantileText.
  */
 InsugarTrading.createQuantileRows = function() {
-    for(let i = 0; i < this.getGoodsCount(); i++) {
+    for(let i = 0; i < InsugarTrading.getGoodsCount(); i++) {
         let upperBox = document.getElementById('bankGood-' + i).firstChild;
         let stockCounterDiv = document.getElementById('bankGood-' + i + '-stockBox');
         let quantileDiv = upperBox.insertBefore(document.createElement("div"), stockCounterDiv);
