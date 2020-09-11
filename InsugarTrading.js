@@ -219,10 +219,14 @@ InsugarTrading.isDataAvailable = function(bankLevel, goodId) {
 
 InsugarTrading.frequency = function(goodId, value) {
     // Returns the data corresponding to the current bank level
-    if(InsugarTrading.data.length > InsugarTrading.getBankLevel())
-        return InsugarTrading.data[InsugarTrading.getBankLevel()][goodId][value];
-    else
+    if(!InsugarTrading.isDataAvailable(InsugarTrading.getBankLevel(), goodId)) {
         return null;
+    }
+    let a = InsugarTrading.data[InsugarTrading.getBankLevel()][goodId];
+    if(value < 0 || value >= a.length) {
+        return 0;
+    }
+    return a[value];
 }
 
 
@@ -359,9 +363,13 @@ InsugarTrading.computePartialSums = function() {
  *
  * If more than one value is valid, the largest one is returned.
  *
- * This function queries InsugarTrading.partialSums.
+ * If there is no available data, it returns null.
+ *
+ * This function queries InsugarTrading.partialSums,
  */
 InsugarTrading.quantile = function(bankLevel, goodId, fraction) {
+    if(!InsugarTrading.isDataAvailable(bankLevel, goodId)) return null;
+
     InsugarTrading.computePartialSums();
     if(fraction < 0) return -Infinity;
     if(fraction > 1) return Infinity;
@@ -400,11 +408,15 @@ InsugarTrading.quantile = function(bankLevel, goodId, fraction) {
  * The result is a value between 0 and 1 (inclusive).
  * A linear approximation is used inside each bin of the histogram.
  *
- * This function queries InsugarTrading.partialSums. */
+ * If there is no available data, it returns null.
+ *
+ * This function queries InsugarTrading.partialSums.
+ */
 InsugarTrading.inverseQuantile = function(bankLevel, goodId, targetValue) {
+    if(!InsugarTrading.isDataAvailable(bankLevel, goodId)) return null;
+
     InsugarTrading.computePartialSums();
     let value = 10 * targetValue; // The histogram works in increments of 0.1
-    if(!InsugarTrading.isDataAvailable(bankLevel, goodId)) return null;
     if(value <= 0) return 0;
     if(value >= InsugarTrading.data[bankLevel][goodId].length) return 1;
 
@@ -419,19 +431,24 @@ InsugarTrading.inverseQuantile = function(bankLevel, goodId, targetValue) {
  *
  * A linear approximation is used inside each bin.
  */
-InsugarTrading.averagePrice = function(goodId) {
+InsugarTrading.averagePrice = function(bankLevel, goodId) {
+    if(!InsugarTrading.isDataAvailable(bankLevel, goodId)) return null;
     let sum = 0;
     let observations = 0;
-    for(let i = 0; i < InsugarTrading.data[lvl][goodId].length; i++) {
-        sum += (i/10+0.05) * InsugarTrading.data[lvl][goodId][i];
-        observations += InsugarTrading.data[lvl][goodId][i];
+    for(let i = 0; i < InsugarTrading.data[bankLevel][goodId].length; i++) {
+        sum += (i/10+0.05) * InsugarTrading.data[bankLevel][goodId][i];
+        observations += InsugarTrading.data[bankLevel][goodId][i];
     }
     return sum/observations;
 }
 
 /* Constructs a string containing the SVG code for a histogram for the given good.
+ *
+ * Returns '' if no data is available.
  */
 InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
+    if(!InsugarTrading.isDataAvailable(bankLevel, goodId)) return '';
+
     let width = 350, height = 250;
     let str = `<svg width="${width}px" height="${height}px">`;
     let upperPriceBound = 200;
@@ -496,8 +513,9 @@ InsugarTrading.interestingness = function(stockQuantile, purchasedPercent) {
  * The signature is appropriate for Game.customMinigame.Bank.buyGood and sellGood.
  */
 InsugarTrading.updateQuantileText = function(id) {
+    let lvl = InsugarTrading.getBankLevel();
     let div = document.getElementById('quantile-' + id);
-    if(InsugarTrading.data === null) {
+    if(!InsugarTrading.isDataAvailable(lvl, id)) {
         div.innerHTML = 'no data';
         div.style.color = '';
         div.style.fontWeight = '';
@@ -505,7 +523,6 @@ InsugarTrading.updateQuantileText = function(id) {
         let good = InsugarTrading.minigame.goodsById[id];
         let value = good.val;
         let ownPercentage = good.stock / InsugarTrading.minigame.getGoodMaxStock(good);
-        let lvl = InsugarTrading.getBankLevel();
         let q = InsugarTrading.inverseQuantile(lvl, id, value);
         div.innerHTML = (Math.floor(10000*q)/100) + '%';
 
@@ -526,7 +543,7 @@ InsugarTrading.customGoodTooltip = function(id, str) {
     if(InsugarTrading.isDataAvailable(lvl, id)) {
         str += InsugarTrading.SVGhistogram(lvl, id, InsugarTrading.minigame.goodsById[id].val);
     } else {
-        str += 'No data available.';
+        str += 'InsugarTrading: No data available.';
     }
     return str;
 }

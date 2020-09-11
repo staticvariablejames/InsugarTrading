@@ -60,6 +60,8 @@ console.assert(almostEqual(InsugarTrading.quantile(1, 0, 0.5), 0.5));
 console.assert(almostEqual(InsugarTrading.quantile(1, 0, 0.6), 0.55));
 console.assert(almostEqual(InsugarTrading.quantile(1, 0, 0.7), 0.6));
 console.assert(almostEqual(InsugarTrading.quantile(1, 0, 1), 1.2));
+console.assert(InsugarTrading.quantile(0, 0, 0.5) === null);
+console.assert(InsugarTrading.quantile(1, 17, 0.5) === null);
 
 console.assert(InsugarTrading.inverseQuantile(1, 0, -1) === 0);
 console.assert(InsugarTrading.inverseQuantile(1, 0, 0) === 0);
@@ -76,5 +78,11 @@ console.assert(almostEqual(InsugarTrading.inverseQuantile(1, 0, 0.55), 0.6));
 console.assert(almostEqual(InsugarTrading.inverseQuantile(1, 0, 0.6), 0.7));
 console.assert(almostEqual(InsugarTrading.inverseQuantile(1, 0, 1.0), 1));
 console.assert(almostEqual(InsugarTrading.inverseQuantile(1, 0, 1.2), 1));
+console.assert(InsugarTrading.inverseQuantile(0, 0, 0.5) === null);
+console.assert(InsugarTrading.inverseQuantile(1, 17, 0.5) === null);
+
+console.assert(almostEqual(InsugarTrading.averagePrice(1, 0), 0.5));
+console.assert(InsugarTrading.averagePrice(0, 0) === null);
+console.assert(InsugarTrading.averagePrice(1, 17) === null);
 
 console.log("Testing done!");
