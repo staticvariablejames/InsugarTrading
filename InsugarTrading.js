@@ -377,7 +377,7 @@ InsugarTrading.quantile = function(bankLevel, goodId, fraction) {
     // Binary search, Hermann Bottenbruch version. i is a lower bound, j is an upper bound
     let a = InsugarTrading.partialSums[bankLevel][goodId];
     let i = 0, j = InsugarTrading.data[bankLevel][goodId].length;
-    let target = fraction * InsugarTrading.tickCount[bankLevel];
+    let target = fraction * a[a.length-1];
     while(i !== j) {
         // Invariant: if k is the largest index such that a[k] <= target, then i <= k <= j.
         let middle = Math.ceil((i+j)/2);
@@ -420,11 +420,12 @@ InsugarTrading.inverseQuantile = function(bankLevel, goodId, targetValue) {
     if(value <= 0) return 0;
     if(value >= InsugarTrading.data[bankLevel][goodId].length) return 1;
 
-    let knownToBeSmaller = InsugarTrading.partialSums[bankLevel][goodId][Math.floor(value)];
+    let partialSums = InsugarTrading.partialSums[bankLevel][goodId];
+    let knownToBeSmaller = partialSums[Math.floor(value)];
     let fraction = value - Math.floor(value);
     // linear approximation inside the bin number Math.floor(value)
     let estimatedToBeSmaller = fraction * InsugarTrading.data[bankLevel][goodId][Math.floor(value)];
-    return (knownToBeSmaller + estimatedToBeSmaller)/InsugarTrading.tickCount[bankLevel];
+    return (knownToBeSmaller + estimatedToBeSmaller)/partialSums[partialSums.length-1];
 }
 
 /* Computes the average price for the given good in the dataset.
