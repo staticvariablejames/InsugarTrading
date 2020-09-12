@@ -373,8 +373,8 @@ InsugarTrading.quantile = function(bankLevel, goodId, fraction) {
 
     // Binary search, Hermann Bottenbruch version. i is a lower bound, j is an upper bound
     let a = InsugarTrading.partialSums[bankLevel][goodId];
-    let i = 0, j = InsugarTrading.data[bankLevel][goodId].length;
-    let target = fraction * a[a.length-1];
+    let i = 0, j = a.length-1;
+    let target = fraction * a[j];
     while(i !== j) {
         // Invariant: if k is the largest index such that a[k] <= target, then i <= k <= j.
         let middle = Math.ceil((i+j)/2);
@@ -456,8 +456,9 @@ InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
     str += '<path d="M 0 ' + height + ' ';
     for(let i = 0; i < 10*upperPriceBound; i++) {
         if(i > 0) str += 'h ' + (width/10/upperPriceBound) + ' ';
-        str += 'V ' + (height - InsugarTrading.data[bankLevel][goodId][i]/upperDensityBound*height)
-            + ' ';
+        str += 'V ' +
+            (height - InsugarTrading.rawFrequency(bankLevel, goodId, i)/upperDensityBound*height) +
+            ' ';
     }
     str += ' Z" fill="cyan" />';
 
