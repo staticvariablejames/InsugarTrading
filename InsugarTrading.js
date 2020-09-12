@@ -230,18 +230,31 @@ InsugarTrading.rawFrequency = function(bankLevel, goodId, value) {
 
 InsugarTrading.isGatheringData = false; // Set to false when the data collection is to stop
 
+/* Increases the value of InsugarTrading.data[bankLevel][goodId][value] by one,
+ * taking care to create the necessary array entries if needed.
+ *
+ * The intermediary arrays InsugarTrading.data and InsugarTrading.data[lvl] may be sparse,
+ * but InsugarTrading.data[lvl][id] will be filled with zeros to mantain density.
+ */
+InsugarTrading.incrementFrequency = function(bankLevel, goodId, value) {
+    if(InsugarTrading.data.length <= bankLevel)
+        InsugarTrading.data[bankLevel] = [];
+    if(InsugarTrading.data[bankLevel].length <= goodId)
+        InsugarTrading.data[bankLevel][goodId] = [];
+
+    for(let v = InsugarTrading.data[bankLevel][goodId].length; v <= value; v++)
+        InsugarTrading.data[bankLevel][goodId][v] = 0;
+
+    InsugarTrading.data[bankLevel][goodId][value]++;
+}
+
 /* InsugarTrading.launch() makes sure this function runs every time the stock market ticks. */
 InsugarTrading.customTickCollectData = function() {
     if(!InsugarTrading.isGatheringData) return;
     for(let id = 0; id < InsugarTrading.getGoodsCount(); id++) {
         let value = InsugarTrading.minigame.goodsById[id].val;
         value = Math.floor(10*value);
-        InsugarTrading.data[InsugarTrading.getBankLevel()][id][value]++;
-    }
-
-    InsugarTrading.tickCount++;
-    if(InsugarTrading.tickCount >= InsugarTrading.tickTarget) {
-        InsugarTrading.isGatheringData = false;
+        InsugarTrading.incrementFrequency(InsugarTrading.getBankLevel(), id, value);
     }
 }
 
