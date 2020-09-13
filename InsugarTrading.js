@@ -482,6 +482,10 @@ InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
     for(let t = 0; t < upperPriceBound; t+=10) {
         let x = t/upperPriceBound * graphWidth + axesMargin;
         str += `<line x1="${x}" y1="${graphHeight-2}" x2="${x}" y2="${graphHeight+2}" stroke="white" />`;
+        // One label every $50
+        if(t % 50 === 0) {
+            str += `<text x="${x}" y="${graphHeight+bottomMargin/2}" text-anchor="middle" dominant-baseline="middle" fill="white" font-size="x-small">$${t}</text>`;
+        }
     }
 
     // Draw the histogram
