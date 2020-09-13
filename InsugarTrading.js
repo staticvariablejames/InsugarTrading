@@ -460,8 +460,8 @@ InsugarTrading.averagePrice = function(bankLevel, goodId) {
 InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
     if(!InsugarTrading.isDataAvailable(bankLevel, goodId)) return '';
 
-    let graphWidth = 330, graphHeight = 240, axesMargin = 10;
-    let str = `<svg width="${graphWidth+2*axesMargin}px" height="${graphHeight + axesMargin}px">`;
+    let graphWidth = 430, graphHeight = 240, axesMargin = 10, bottomMargin = 20;
+    let str = `<svg width="${graphWidth+2*axesMargin}px" height="${graphHeight + bottomMargin}px">`;
     // We ignore the top margin
 
     let quantileThreshold = 0.99999;
