@@ -460,24 +460,42 @@ InsugarTrading.averagePrice = function(bankLevel, goodId) {
 InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
     if(!InsugarTrading.isDataAvailable(bankLevel, goodId)) return '';
 
-    let width = 350, height = 250;
-    let str = `<svg width="${width}px" height="${height}px">`;
-    let upperPriceBound = 200;
+    let graphWidth = 330, graphHeight = 240, axesMargin = 10;
+    let str = `<svg width="${graphWidth+2*axesMargin}px" height="${graphHeight + axesMargin}px">`;
+    // We ignore the top margin
+
+    let quantileThreshold = 0.99999;
+    let upperPriceBound = InsugarTrading.data[bankLevel].map(
+            (_, id) => InsugarTrading.quantile(bankLevel, i, quantileThreshold)
+        ).reduce(
+            (a, b) => Math.max(a, b)
+        );
+    // This way, every graph has the same scale and nicely fits between 0 and upperPriceBound.
+
     let upperDensityBound = 5000000; // TODO: add proper computation methods
 
+    // Draw axes
+    str += `<path d="M ${axesMargin} 0 v ${graphHeight} h ${axesMargin+graphWidth}$"`
+        + ' stroke="white" fill="none" />';
+
+    // One axis tick every $10
+    for(let t = 0; t < upperPriceBound; t+=10) {
+        let x = t/upperPriceBound * graphWidth + axesMargin;
+        str += `<line x1="${x}" y1="${graphHeight-2}" x2="${x}" y2="${graphHeight+2}" stroke="white" />`;
+    }
+
     // Draw the histogram
-    str += '<path d="M 0 ' + height + ' ';
+    str += `<path d="M ${axesMargin} ${graphHeight} `;
     for(let i = 0; i < 10*upperPriceBound; i++) {
-        if(i > 0) str += 'h ' + (width/10/upperPriceBound) + ' ';
-        str += 'V ' +
-            (height - InsugarTrading.rawFrequency(bankLevel, goodId, i)/upperDensityBound*height) +
-            ' ';
+        if(i > 0) str += 'h ' + (graphWidth/10/upperPriceBound) + ' ';
+        let barHeight = InsugarTrading.rawFrequency(bankLevel, goodId, i)/upperDensityBound*graphHeight;
+        str += 'V ' + (graphHeight - barHeight) + ' ';
     }
     str += ' Z" fill="cyan" />';
 
     // Draw an orange line with the current price
-    let x = currentPrice/upperPriceBound * width;
-    str += `<line x1="${x}" y1="0" x2="${x}" y2="${height}" stroke="orange" />`;
+    let x = currentPrice/upperPriceBound * graphWidth + axesMargin;
+    str += `<line x1="${x}" y1="0" x2="${x}" y2="${graphHeight}" stroke="orange" />`;
 
     str += '</svg>';
     return str;
