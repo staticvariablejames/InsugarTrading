@@ -3,6 +3,12 @@ var InsugarTrading = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE.js');
 // CCSE calls Game.Win('Third-party') for us
 
+// InsugarTrading.launch is at the end of this file.
+InsugarTrading.name = "Insugar Trading";
+InsugarTrading.version = "1.0.0"; // Semantic versioning
+InsugarTrading.GameVersion = "2.029";
+InsugarTrading.CCSEVersion = "2.017";
+
 /* The data here is just a histogram:
  * data[bankLvl][id][value] is the number of times that the id-th stock
  * (as listed by Game.Objects['Bank'].goodsById)
@@ -596,6 +602,11 @@ InsugarTrading.customTickDisplayData = function() {
  **************/
 
 InsugarTrading.launch = function() {
+    if(!CCSE.ConfirmGameCCSEVersion(InsugarTrading.name, InsugarTrading.version, InsugarTrading.GameVersion, InsugarTrading.CCSEVersion)) {
+        InsugarTrading.isLoaded = true;
+        return;
+    }
+
     CCSE.MinigameReplacer(function(){
         InsugarTrading.minigame = Game.Objects['Bank'].minigame;
         InsugarTrading.createQuantileRows();
@@ -607,6 +618,8 @@ InsugarTrading.launch = function() {
         Game.customMinigame['Bank'].sellGood.push(InsugarTrading.updateQuantileText);
         Game.customMinigame['Bank'].goodTooltip.push(InsugarTrading.customGoodTooltip);
     },'Bank');
+
+    InsugarTrading.isLoaded = true;
 }
 
 // Code copied from CCSE's documentation
