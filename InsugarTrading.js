@@ -155,6 +155,8 @@ InsugarTrading.fastTicker.tickSeveralTimes = function() {
          * This is a simple way of maximizing for speed without guessing.
          */
     }
+
+    console.log("Progress: " + (100*this.ticks/this.tickTarget) + "%");
 }
 
 InsugarTrading.fastTicker.stopDataCollection = function() {
