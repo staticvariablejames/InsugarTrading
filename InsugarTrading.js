@@ -52,10 +52,10 @@ InsugarTrading.isDataAvailable = function(bankLevel, goodId) {
  * which is actually what "frequency" means in this case.
  */
 InsugarTrading.rawFrequency = function(bankLevel, goodId, value) {
-    if(!InsugarTrading.isDataAvailable(InsugarTrading.getBankLevel(), goodId)) {
+    if(!InsugarTrading.isDataAvailable(bankLevel, goodId)) {
         return null;
     }
-    let a = InsugarTrading.data[InsugarTrading.getBankLevel()][goodId];
+    let a = InsugarTrading.data[bankLevel][goodId];
     if(value < 0 || value >= a.length) {
         return 0;
     }
