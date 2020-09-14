@@ -25,6 +25,11 @@ InsugarTrading.data = [null];
 
 InsugarTrading.minigame = null; // Set to Game.Objects['Bank'].minigame on InsugarTrading.launch()
 
+InsugarTrading.isGatheringData = false;
+/* isGatheringData is managed by the Data Gathering part of the mod.
+ * In short, data should not be accessed while isGatheringData is true.
+ */
+
 // Utility accessor functions
 InsugarTrading.getBankLevel = function() {
     if(InsugarTrading.minigame) {
@@ -39,6 +44,8 @@ InsugarTrading.getGoodsCount = function() {
 }
 
 InsugarTrading.isDataAvailable = function(bankLevel, goodId) {
+    if(InsugarTrading.isGatheringData)
+        return false;
     if(bankLevel <= 0 || bankLevel >= InsugarTrading.data.length)
         return false;
     if(goodId > InsugarTrading.data[bankLevel].length)
@@ -67,8 +74,6 @@ InsugarTrading.rawFrequency = function(bankLevel, goodId, value) {
 /******************
  * DATA GATHERING *
  ******************/
-
-InsugarTrading.isGatheringData = false; // Set to false when the data collection is to stop
 
 /* Increases the value of InsugarTrading.data[bankLevel][goodId][value] by one,
  * taking care to create the necessary array entries if needed.
