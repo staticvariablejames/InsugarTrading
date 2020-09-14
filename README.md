@@ -114,6 +114,11 @@ Changelog
 
 Initial release.
 
+1.1.0
+-----
+
+Move the 1.4MB dataset to its own file.
+
 
 License
 =======
