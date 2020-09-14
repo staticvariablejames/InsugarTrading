@@ -27,7 +27,11 @@ InsugarTrading.minigame = null; // Set to Game.Objects['Bank'].minigame on Insug
 
 // Utility accessor functions
 InsugarTrading.getBankLevel = function() {
-    return InsugarTrading.minigame.parent.level;
+    if(InsugarTrading.minigame) {
+        return InsugarTrading.minigame.parent.level;
+    } else {
+        return 0; // The minigame was not loaded yet
+    }
 }
 
 InsugarTrading.getGoodsCount = function() {
@@ -375,6 +379,7 @@ InsugarTrading.createQuantileRows = function() {
 
         quantileDiv.innerHTML = 'Quantile: <div id="quantile-' + i + '" ' +
             'style="display:inline">no data</div>';
+        InsugarTrading.updateQuantileText(i);
     }
 }
 
@@ -428,7 +433,12 @@ InsugarTrading.customGoodTooltip = function(id, str) {
 }
 
 InsugarTrading.customTickDisplayData = function() {
-    if(InsugarTrading.isGatheringData) return;
+    if(InsugarTrading.minigame === null) return;
+    /* InsugarTradingData.js calls this method as soon as it is loaded,
+     * so we have to make sure this will not throw an exception
+     * if the bank minigame hasn't loaded yet.
+     */
+
     for(let i = 0; i < InsugarTrading.minigame.goodsById.length; i++) {
         InsugarTrading.updateQuantileText(i);
     }
