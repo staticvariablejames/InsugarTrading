@@ -119,7 +119,10 @@ InsugarTrading.fastTicker.intervalID = undefined;
 /* Collects data for the given number of ticks.
  * The data is aggregated to the current dataset.
  */
-InsugarTrading.fastTicker.collectData = function(tickTarget) {
+InsugarTrading.fastTicker.collectData = function(tickTarget, discardCurrentDataset) {
+    if(discardCurrentDataset) InsugarTrading.data = [null];
+    // InsugarTrading.fastTicker.incrementFrequency takes care of filling the blanks
+
     this.tickTarget = tickTarget;
     this.ticks = 0;
     InsugarTrading.isGatheringData = true;
