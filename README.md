@@ -119,6 +119,11 @@ Initial release.
 
 Move the 1.4MB dataset to its own file.
 
+1.1.1
+-----
+
+Fix a performance bug when collecting data.
+
 
 License
 =======
