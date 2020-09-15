@@ -446,6 +446,14 @@ InsugarTrading.customTickDisplayData = function() {
      * if the bank minigame hasn't loaded yet.
      */
 
+    if(InsugarTrading.isGatheringData) return;
+    /* InsugarTrading.updateQuantileText manipulates the DOM
+     * regardless of whether the data is available or not.
+     * If this check was missing, that would meant thousands of DOM manipulations per second,
+     * which significantly slows down data collection
+     * (a factor of 5 in my experiments).
+     */
+
     for(let i = 0; i < InsugarTrading.minigame.goodsById.length; i++) {
         InsugarTrading.updateQuantileText(i);
     }
