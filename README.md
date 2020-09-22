@@ -25,9 +25,9 @@ which tracks how many times each stock had a given value,
 with a $0.10 precision.
 
 Since the bank level influences the stock values,
-I simulated for bank levels between 1 and 10
+I simulated for bank levels between 1 and 30
 (which I believe to be the most common levels).
-So the dataset actually has 150 histograms,
+So the dataset actually has 450 histograms,
 one for each bank level and each stock.
 
 See the source code for details on how to collect the data yourself;
@@ -85,7 +85,7 @@ and is also orange for stocks you currently own that are at a high price,
 suggesting you might want to sell those stocks.
 The color is grayer the less true those statements are.
 
-(These statistics are currently available only if the bank level is at most 10.)
+(These statistics are currently available only if the bank level is at most 30.)
 
 
 Using the mod
