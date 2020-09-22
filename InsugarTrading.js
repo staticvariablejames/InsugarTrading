@@ -358,8 +358,10 @@ InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
     str += ' Z" fill="cyan" />';
 
     // Draw an orange line with the current price
-    let x = currentPrice/upperPriceBound * graphWidth + axesMargin;
-    str += `<line x1="${x}" y1="0" x2="${x}" y2="${graphHeight}" stroke="orange" />`;
+    if(currentPrice) {
+        let x = currentPrice/upperPriceBound * graphWidth + axesMargin;
+        str += `<line x1="${x}" y1="0" x2="${x}" y2="${graphHeight}" stroke="orange" />`;
+    }
 
     str += '</svg>';
     return str;
