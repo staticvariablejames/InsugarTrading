@@ -124,6 +124,11 @@ Move the 1.4MB dataset to its own file.
 
 Fix a performance bug when collecting data.
 
+1.1.2
+-----
+
+Add datasets for bank levels up to 30,
+and display the mod's version number in the stats menu.
 
 License
 =======
