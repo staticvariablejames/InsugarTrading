@@ -488,6 +488,10 @@ InsugarTrading.launch = function() {
         Game.customMinigame['Bank'].goodTooltip.push(InsugarTrading.customGoodTooltip);
     },'Bank');
 
+    Game.customStatsMenu.push(function() {
+        CCSE.AppendStatsVersionNumber(InsugarTrading.name, InsugarTrading.version);
+    });
+
     InsugarTrading.isLoaded = true;
 }
 
