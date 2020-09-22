@@ -316,9 +316,11 @@ InsugarTrading.averagePrice = function(bankLevel, goodId) {
 /* Constructs a string containing the SVG code for a histogram for the given good.
  *
  * Returns '' if no data is available.
+ * This function queries InsugarTrading.partialSums.
  */
 InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
     if(!InsugarTrading.isDataAvailable(bankLevel, goodId)) return '';
+    InsugarTrading.computePartialSums();
 
     let graphWidth = 430, graphHeight = 240, axesMargin = 10, bottomMargin = 20;
     let str = `<svg width="${graphWidth+2*axesMargin}px" height="${graphHeight + bottomMargin}px">`;
@@ -332,7 +334,10 @@ InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
         );
     // This way, every graph has the same scale and nicely fits between 0 and upperPriceBound.
 
-    let upperDensityBound = 5000000; // TODO: add proper computation methods
+    let entryCount = InsugarTrading.data[bankLevel][goodId].length;
+    let density = InsugarTrading.partialSums[bankLevel][goodId][entryCount]/100;
+    /* This way, a stock that is uniformly distributed over a range of $10
+     * would form a rectangle whose height is the entire range. */
 
     // Draw axes
     str += `<path d="M ${axesMargin} 0 v ${graphHeight} h ${axesMargin+graphWidth}$"`
@@ -352,7 +357,7 @@ InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
     str += `<path d="M ${axesMargin} ${graphHeight} `;
     for(let i = 0; i < 10*upperPriceBound; i++) {
         if(i > 0) str += 'h ' + (graphWidth/10/upperPriceBound) + ' ';
-        let barHeight = InsugarTrading.rawFrequency(bankLevel, goodId, i)/upperDensityBound*graphHeight;
+        let barHeight = InsugarTrading.rawFrequency(bankLevel, goodId, i)/density*graphHeight;
         str += 'V ' + (graphHeight - barHeight) + ' ';
     }
     str += ' Z" fill="cyan" />';
