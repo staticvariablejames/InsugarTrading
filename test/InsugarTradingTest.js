@@ -25,7 +25,12 @@ InsugarTrading.data = [null, [
     [ 0, 1, 2, 3, 4, 4, 3, 2, 1],
     [ 0, 1, 2, 3, 4, 4, 3, 2, 1],
     [ 0, 1, 2, 3, 4, 4, 3, 2, 1],
-]];
+],/*empty*/,[
+    [ 0, 2, 4, 6, 8, 8, 6, 4, 2],
+    /*empty*/,
+    [ 0, 1, 2, 3, 4, 4, 3, 2, 1],
+],
+];
 
 // Clear the cache
 InsugarTrading.partialSums = null;
@@ -41,7 +46,7 @@ InsugarTrading.getGoodsCount = () => 16;
 InsugarTrading.computePartialSums();
 
 console.assert(InsugarTrading.partialSums !== null);
-console.assert(InsugarTrading.partialSums.length === 2);
+console.assert(InsugarTrading.partialSums.length === 4);
 console.assert(InsugarTrading.partialSums[1].length === 16);
 console.assert(InsugarTrading.partialSums[1][0].length === 10);
 console.assert(InsugarTrading.partialSums[1][1].length === 11);
@@ -91,6 +96,14 @@ console.assert(almostEqual(InsugarTrading.inverseQuantile(1, 0, 1.0), 1));
 console.assert(almostEqual(InsugarTrading.inverseQuantile(1, 0, 1.2), 1));
 console.assert(InsugarTrading.inverseQuantile(0, 0, 0.5) === null);
 console.assert(InsugarTrading.inverseQuantile(1, 17, 0.5) === null);
+
+// Test whether everything works with incomplete datasets
+console.assert(!InsugarTrading.isDataAvailable(2, 0));
+console.assert(InsugarTrading.isDataAvailable(3, 0));
+console.assert(!InsugarTrading.isDataAvailable(3, 1));
+console.assert(InsugarTrading.isDataAvailable(3, 2));
+console.assert(almostEqual(InsugarTrading.inverseQuantile(3, 0, 0.2), 0.05));
+console.assert(almostEqual(InsugarTrading.inverseQuantile(3, 2, 0.2), 0.05));
 
 console.assert(almostEqual(InsugarTrading.averagePrice(1, 0), 0.5));
 console.assert(almostEqual(InsugarTrading.averagePrice(1, 1), 0.6));

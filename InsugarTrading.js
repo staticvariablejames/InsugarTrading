@@ -48,9 +48,7 @@ InsugarTrading.isDataAvailable = function(bankLevel, goodId) {
         return false;
     if(bankLevel <= 0 || bankLevel >= InsugarTrading.data.length)
         return false;
-    if(goodId > InsugarTrading.data[bankLevel].length)
-        return false;
-    return true;
+    return bankLevel in InsugarTrading.data && goodId in InsugarTrading.data[bankLevel];
 }
 
 /* Returns InsugarTrading.data[bankLevel][goodId][value] if available.
@@ -213,13 +211,14 @@ InsugarTrading.datasetToString = function() {
 InsugarTrading.partialSums = null;
 InsugarTrading.computePartialSums = function() {
     if(InsugarTrading.data === null || InsugarTrading.partialSums !== null) return;
-    InsugarTrading.partialSums = new Array(InsugarTrading.data.length);
-    for(let lvl = 1; lvl < InsugarTrading.partialSums.length; lvl++) {
-        InsugarTrading.partialSums[lvl] = new Array(InsugarTrading.getGoodsCount());
-        for(let id = 0; id < InsugarTrading.getGoodsCount(); id++) {
+    InsugarTrading.partialSums = [];
+    for(let lvl in InsugarTrading.data) {
+        InsugarTrading.partialSums[lvl] = [];
+        for(let id in InsugarTrading.data[lvl]) {
             InsugarTrading.partialSums[lvl][id] = new Array(InsugarTrading.data[lvl][id].length + 1);
             InsugarTrading.partialSums[lvl][id][0] = 0;
             for(let v = 0; v < InsugarTrading.data[lvl][id].length; v++) {
+                // This is the only step where we actually need the numerical index
                 InsugarTrading.partialSums[lvl][id][v+1] = InsugarTrading.partialSums[lvl][id][v] +
                         InsugarTrading.data[lvl][id][v];
             }
