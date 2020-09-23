@@ -480,8 +480,6 @@ InsugarTrading.launch = function() {
         return;
     }
 
-    Game.LoadMod('https://staticvariablejames.github.io/InsugarTrading/InsugarTradingData.js');
-
     CCSE.MinigameReplacer(function(){
         InsugarTrading.minigame = Game.Objects['Bank'].minigame;
         InsugarTrading.createQuantileRows();
@@ -492,6 +490,11 @@ InsugarTrading.launch = function() {
         Game.customMinigame['Bank'].buyGood.push(InsugarTrading.updateQuantileText);
         Game.customMinigame['Bank'].sellGood.push(InsugarTrading.updateQuantileText);
         Game.customMinigame['Bank'].goodTooltip.push(InsugarTrading.customGoodTooltip);
+
+        let lvl = InsugarTrading.getBankLevel();
+        if(lvl >= 1 && lvl <= 30) {
+            Game.LoadMod('https://staticvariablejames.github.io/InsugarTrading/data/lvl' + lvl + '.js');
+        }
     },'Bank');
 
     Game.customStatsMenu.push(function() {
