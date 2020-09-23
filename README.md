@@ -130,6 +130,26 @@ Fix a performance bug when collecting data.
 Add datasets for bank levels up to 30,
 and display the mod's version number in the stats menu.
 
+1.2.0
+-----
+
+The 4.7M dataset was split in files of around 150K each
+(one for each bank level);
+only the needed datasets are downloaded.
+This should ease the burden on slower connections and speed up loading the mod.
+
+Minor improvements on the histogram display.
+
+Known Bugs/Limitations
+======================
+
+Only datasets for banks up to level 30 are available
+(although I believe this should be enough for most players).
+
+Currently, the displayed quantiles are not updated if the bank is levelled up.
+This issue fixes itself with the next tick,
+but the mod displays slightly wrong information before it comes.
+
 License
 =======
 
