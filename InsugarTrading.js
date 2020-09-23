@@ -499,6 +499,16 @@ InsugarTrading.launch = function() {
         CCSE.AppendStatsVersionNumber(InsugarTrading.name, InsugarTrading.version);
     });
 
+    CCSE.customLoad.push(InsugarTrading.customTickDisplayData);
+    /* This is a kludge.
+     * We have to run customTickDisplayData after the invocation of Game.Objects.Bank.minigame.load
+     * (otherwise the wrong values will be displayed)
+     * and there are no hooks that allows us to run this function right after the minigame loads.
+     * It happens that in the current implementation of CCSE,
+     * CCSE.LoadSave is also called after a save game is loaded (by vanilla means),
+     * so the above kludge works.
+     */
+
     InsugarTrading.isLoaded = true;
 }
 
