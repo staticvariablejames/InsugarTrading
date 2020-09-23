@@ -28,16 +28,23 @@ InsugarTrading.data = [null];
 InsugarTrading.datasetUrl = function(bankLevel) {
     return 'https://staticvariablejames.github.io/InsugarTrading/data/lvl' + bankLevel + '.js';
 }
+InsugarTrading.highestAvailableDatasetLevel = 30;
 
-/* Datasets are dynamically loaded.
+/* Downloads a dataset from the github website.
+ *
+ * Nothing happens if the data cannot be made available,
+ * or if the respective dataset was already requested.
+ *
  * Whenever a dataset for a certain bank level is loaded,
  * all functions in onDatasetLoad are called,
  * passing the bank level of the newly available dataset as argument.
  */
 InsugarTrading.onDatasetLoad = [];
 InsugarTrading.fetchDataset = function(bankLevel) {
-    if(bankLevel <= 0 || bankLevel > 30) return;
+    if(bankLevel <= 0 || bankLevel > InsugarTrading.highestAvailableDatasetLevel) return;
     if(bankLevel in InsugarTrading.data) return; // Dataset already fetched
+
+    InsugarTrading.data[bankLevel] = []; // Simple way of marking that a fetch request was issued
 
     // The following code duplicates part of Game.LoadMod,
     // but ensuring to call all functions of onDatasetLoad.
@@ -45,7 +52,7 @@ InsugarTrading.fetchDataset = function(bankLevel) {
     script.setAttribute('type', 'text/javascript');
     script.setAttribute('src', InsugarTrading.datasetUrl(bankLevel));
     script.onload = function() {
-        for(f of InsugarTrading.onDatasetLoad) {
+        for(let f of InsugarTrading.onDatasetLoad) {
             f(bankLevel);
         }
     }
@@ -72,12 +79,18 @@ InsugarTrading.getGoodsCount = function() {
     return InsugarTrading.minigame.goodsById.length;
 }
 
+/* If data is available returns true.
+ * If data can be downloaded, downloads it but returns false in the meanwhile.
+ * Returns false otherwise.
+ */
 InsugarTrading.isDataAvailable = function(bankLevel, goodId) {
     if(InsugarTrading.isGatheringData)
         return false;
-    if(bankLevel <= 0 || bankLevel >= InsugarTrading.data.length)
+    if(!(bankLevel in InsugarTrading.data)) {
+        InsugarTrading.fetchDataset(bankLevel);
         return false;
-    return bankLevel in InsugarTrading.data && goodId in InsugarTrading.data[bankLevel];
+    }
+    return goodId in (InsugarTrading.data[bankLevel] ?? []);
 }
 
 /* Returns InsugarTrading.data[bankLevel][goodId][value] if available.
@@ -225,29 +238,25 @@ InsugarTrading.datasetToString = function() {
  * InsugarTrading.partialSums[id].length === InsugarTrading.data[id].length + 1,
  * and the last value of InsugarTrading.partialSums[lvl][id] equals InsugarTrading.tickCount[lvl].
  *
- * It is computed by InsugarTrading.computePartialSums,
- * unless the data is unavailable or the partial sums are already computed.
- *
- * Setting InsugarTrading.partialSums to null clears the "partial sum cache"
- * and triggers a recomputation.
+ * It is computed by InsugarTrading.computePartialSums right after the dataset is loaded,
+ * so whenever InsugarTrading.isDataAvailable(lvl, id) is true
+ * (and no data was collected in this session)
+ * the partial sums are available.
  */
-InsugarTrading.partialSums = null;
-InsugarTrading.computePartialSums = function() {
-    if(InsugarTrading.data === null || InsugarTrading.partialSums !== null) return;
-    InsugarTrading.partialSums = [];
-    for(let lvl in InsugarTrading.data) {
-        InsugarTrading.partialSums[lvl] = [];
-        for(let id in InsugarTrading.data[lvl]) {
-            InsugarTrading.partialSums[lvl][id] = new Array(InsugarTrading.data[lvl][id].length + 1);
-            InsugarTrading.partialSums[lvl][id][0] = 0;
-            for(let v = 0; v < InsugarTrading.data[lvl][id].length; v++) {
-                // This is the only step where we actually need the numerical index
-                InsugarTrading.partialSums[lvl][id][v+1] = InsugarTrading.partialSums[lvl][id][v] +
-                        InsugarTrading.data[lvl][id][v];
-            }
+InsugarTrading.partialSums = [];
+InsugarTrading.computePartialSums = function(lvl) {
+    InsugarTrading.partialSums[lvl] = [];
+    for(let id in InsugarTrading.data[lvl]) {
+        InsugarTrading.partialSums[lvl][id] = new Array(InsugarTrading.data[lvl][id].length + 1);
+        InsugarTrading.partialSums[lvl][id][0] = 0;
+        for(let v = 0; v < InsugarTrading.data[lvl][id].length; v++) {
+            // This is the only step where we actually need the numerical index
+            InsugarTrading.partialSums[lvl][id][v+1] = InsugarTrading.partialSums[lvl][id][v] +
+                    InsugarTrading.data[lvl][id][v];
         }
     }
 }
+InsugarTrading.onDatasetLoad.push(InsugarTrading.computePartialSums);
 
 /* Returns a value such that the given fraction of the values in the histogram are smaller than it
  * and 1-fraction of the values in the histogram are higher than it.
@@ -256,13 +265,10 @@ InsugarTrading.computePartialSums = function() {
  * If more than one value is valid, the largest one is returned.
  *
  * If there is no available data, it returns null.
- *
- * This function queries InsugarTrading.partialSums,
  */
 InsugarTrading.quantile = function(bankLevel, goodId, fraction) {
     if(!InsugarTrading.isDataAvailable(bankLevel, goodId)) return null;
 
-    InsugarTrading.computePartialSums();
     if(fraction < 0) return -Infinity;
     if(fraction > 1) return Infinity;
 
@@ -301,13 +307,10 @@ InsugarTrading.quantile = function(bankLevel, goodId, fraction) {
  * A linear approximation is used inside each bin of the histogram.
  *
  * If there is no available data, it returns null.
- *
- * This function queries InsugarTrading.partialSums.
  */
 InsugarTrading.inverseQuantile = function(bankLevel, goodId, targetValue) {
     if(!InsugarTrading.isDataAvailable(bankLevel, goodId)) return null;
 
-    InsugarTrading.computePartialSums();
     let value = 10 * targetValue; // The histogram works in increments of 0.1
     if(value <= 0) return 0;
     if(value >= InsugarTrading.data[bankLevel][goodId].length) return 1;
@@ -338,11 +341,9 @@ InsugarTrading.averagePrice = function(bankLevel, goodId) {
 /* Constructs a string containing the SVG code for a histogram for the given good.
  *
  * Returns '' if no data is available.
- * This function queries InsugarTrading.partialSums.
  */
 InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
     if(!InsugarTrading.isDataAvailable(bankLevel, goodId)) return '';
-    InsugarTrading.computePartialSums();
 
     let graphWidth = 430, graphHeight = 240, axesMargin = 10, bottomMargin = 20;
     let str = `<svg width="${graphWidth+2*axesMargin}px" height="${graphHeight + bottomMargin}px">`;

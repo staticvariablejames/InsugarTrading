@@ -8,7 +8,7 @@ var almostEqual = function(a, b) {
 }
 
 // Testing dataset
-InsugarTrading.data = [null, [
+let testDataset = [null, [
     [ 0, 1, 2, 3, 4, 4, 3, 2, 1],
     [ 0, 0, 1, 2, 3, 4, 4, 3, 2, 1],
     [ 0, 0, 0, 1, 2, 3, 4, 4, 3, 2, 1],
@@ -32,10 +32,20 @@ InsugarTrading.data = [null, [
 ],
 ];
 
-// Clear the cache
-InsugarTrading.partialSums = null;
+// Mock fetchDataset
+InsugarTrading.fetchDataset = function(bankLevel) {
+    if(bankLevel in InsugarTrading.data) return;
+    if(bankLevel == 1) {
+        InsugarTrading.data[1] = testDataset[1];
+        for(let f of InsugarTrading.onDatasetLoad) f(1);
+    }
+    if(bankLevel == 3) {
+        InsugarTrading.data[3] = testDataset[3];
+        for(let f of InsugarTrading.onDatasetLoad) f(3);
+    }
+}
 
-console.assert(InsugarTrading.data[1].length === 16); // Testing the test
+console.assert(testDataset[1].length === 16); // Testing the test
 // The extra row is to test independence from Game.Objects.Bank.minigame.objectsById.length
 
 // Pretend the bank has level 1
@@ -43,10 +53,14 @@ InsugarTrading.getBankLevel = () => 1;
 // Pretend there are 16 goods
 InsugarTrading.getGoodsCount = () => 16;
 
-InsugarTrading.computePartialSums();
+// Clear the current dataset
+InsugarTrading.data = [null];
+
+InsugarTrading.fetchDataset(1);
+// Should call InsugarTrading.computePartialSums
 
 console.assert(InsugarTrading.partialSums !== null);
-console.assert(InsugarTrading.partialSums.length === 4);
+console.assert(InsugarTrading.partialSums.length === 2);
 console.assert(InsugarTrading.partialSums[1].length === 16);
 console.assert(InsugarTrading.partialSums[1][0].length === 10);
 console.assert(InsugarTrading.partialSums[1][1].length === 11);
@@ -99,7 +113,8 @@ console.assert(InsugarTrading.inverseQuantile(1, 17, 0.5) === null);
 
 // Test whether everything works with incomplete datasets
 console.assert(!InsugarTrading.isDataAvailable(2, 0));
-console.assert(InsugarTrading.isDataAvailable(3, 0));
+console.assert(!InsugarTrading.isDataAvailable(3, 0)); // First call is false
+console.assert(InsugarTrading.isDataAvailable(3, 0)); // Second call is true, as data already loaded
 console.assert(!InsugarTrading.isDataAvailable(3, 1));
 console.assert(InsugarTrading.isDataAvailable(3, 2));
 console.assert(almostEqual(InsugarTrading.inverseQuantile(3, 0, 0.2), 0.05));
