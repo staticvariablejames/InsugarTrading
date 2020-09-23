@@ -169,23 +169,17 @@ InsugarTrading.fastTicker.stopDataCollection = function() {
 
 InsugarTrading.datasetToString = function() {
     // Essentially returns InsugarTradingData.js.
-    let str = 'InsugarTrading.data = [null];\n\n';
+    let str = '';
     for(let lvl in InsugarTrading.data) {
         if(lvl == 0) continue; // == instead of === because lvl is actually a string
+        if(lvl != 1) str += '\n';
 
         str += 'InsugarTrading.data[' + lvl + '] = [];\n';
         for(let id in InsugarTrading.data[lvl]) {
             str += 'InsugarTrading.data[' + lvl + '][' + id + '] = [' +
                 InsugarTrading.data[lvl][id].join(',') + '];\n';
         }
-        str += '\n';
     }
-
-    str += 'InsugarTrading.customTickDisplayData();\n';
-    /* Adding this call at the end of the file guarantees the "Quantile: XX%" text boxes
-     * have the correct text right after the dataset is loaded,
-     * rather than having to wait till the next tick for it.
-     */
 
     return str;
 }
@@ -494,6 +488,14 @@ InsugarTrading.launch = function() {
         let lvl = InsugarTrading.getBankLevel();
         if(lvl >= 1 && lvl <= 30) {
             Game.LoadMod('https://staticvariablejames.github.io/InsugarTrading/data/lvl' + lvl + '.js');
+
+            /* This makes sure that customTickDisplayData is called,
+             * independently of whatever is at the end of the datasets.
+             */
+            document.getElementById('modscript_lvl' + lvl).onload = function() {
+                InsugarTrading.customTickDisplayData();
+            }
+            InsugarTrading.customTickDisplayData();
         }
     },'Bank');
 
