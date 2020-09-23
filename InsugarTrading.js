@@ -18,10 +18,39 @@ InsugarTrading.CCSEVersion = "2.017";
  * while the Bank building had the level bankLvl.
  * So this histogram goes in 10-cents increments.
  *
- * The actual dataset is in InsugarTradingData.js,
- * loaded in InsugarTrading.launch.
+ * The actual datasets are located in data/lvl1.js through data/lvl30.js
+ * and are loaded in InsugarTrading.launch.
+ * These scripts just assign appropriate arrays to this dataset.
+ * Multiple of them can be loaded simultaneously.
  */
 InsugarTrading.data = [null];
+
+InsugarTrading.datasetUrl = function(bankLevel) {
+    return 'https://staticvariablejames.github.io/InsugarTrading/data/lvl' + bankLevel + '.js';
+}
+
+/* Datasets are dynamically loaded.
+ * Whenever a dataset for a certain bank level is loaded,
+ * all functions in onDatasetLoad are called,
+ * passing the bank level of the newly available dataset as argument.
+ */
+InsugarTrading.onDatasetLoad = [];
+InsugarTrading.fetchDataset = function(bankLevel) {
+    if(bankLevel <= 0 || bankLevel > 30) return;
+    if(bankLevel in InsugarTrading.data) return; // Dataset already fetched
+
+    // The following code duplicates part of Game.LoadMod,
+    // but ensuring to call all functions of onDatasetLoad.
+    let script = document.createElement('script');
+    script.setAttribute('type', 'text/javascript');
+    script.setAttribute('src', InsugarTrading.datasetUrl(bankLevel));
+    script.onload = function() {
+        for(f of InsugarTrading.onDatasetLoad) {
+            f(bankLevel);
+        }
+    }
+    document.head.appendChild(script);
+}
 
 InsugarTrading.minigame = null; // Set to Game.Objects['Bank'].minigame on InsugarTrading.launch()
 
@@ -485,18 +514,8 @@ InsugarTrading.launch = function() {
         Game.customMinigame['Bank'].sellGood.push(InsugarTrading.updateQuantileText);
         Game.customMinigame['Bank'].goodTooltip.push(InsugarTrading.customGoodTooltip);
 
-        let lvl = InsugarTrading.getBankLevel();
-        if(lvl >= 1 && lvl <= 30) {
-            Game.LoadMod('https://staticvariablejames.github.io/InsugarTrading/data/lvl' + lvl + '.js');
-
-            /* This makes sure that customTickDisplayData is called,
-             * independently of whatever is at the end of the datasets.
-             */
-            document.getElementById('modscript_lvl' + lvl).onload = function() {
-                InsugarTrading.customTickDisplayData();
-            }
-            InsugarTrading.customTickDisplayData();
-        }
+        InsugarTrading.onDatasetLoad.push(InsugarTrading.customTickDisplayData);
+        InsugarTrading.fetchDataset(InsugarTrading.getBankLevel());
     },'Bank');
 
     Game.customStatsMenu.push(function() {
