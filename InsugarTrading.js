@@ -391,6 +391,12 @@ InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
         str += `<line x1="${x}" y1="0" x2="${x}" y2="${graphHeight}" stroke="orange" />`;
     }
 
+    // Draw the name of the stock in the top right corner
+    str += `<text x="${graphWidth+axesMargin}" y="${axesMargin}" text-anchor="end"` +
+        ` dominant-baseline="hanging" fill="white" font-size="large">` +
+        InsugarTrading.minigame.goodsById[goodId].symbol +
+        '</text>';
+
     str += '</svg>';
     return str;
 }
