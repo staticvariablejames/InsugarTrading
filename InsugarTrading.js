@@ -405,7 +405,7 @@ InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
 InsugarTrading.allSVGHistograms = function(bankLevel) {
     let str = '';
     let innerWidth = 450, innerHeight = 260;
-    str += `<svg width="${5*innerWidth}px" height="${3*innerHeight}px">`;
+    str += `<svg width="${5*innerWidth}px" height="${3*innerHeight+40}px">`;
     str += '<rect width="100%" height="100%" fill="black" />'; // background
     for(let i = 0; i < 3; i++) {
         for(let j = 0; j < 5; j++) {
@@ -415,6 +415,10 @@ InsugarTrading.allSVGHistograms = function(bankLevel) {
             str += '</svg>';
         }
     }
+    str += `<text x="20px" y="${3*innerHeight+20}px" ` +
+        'dominant-baseline="middle" fill="white" font-size="32px">' +
+        'Bank level ' + bankLevel +
+        '</text>';
     str += '</svg>';
     return str;
 }
