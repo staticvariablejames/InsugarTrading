@@ -363,7 +363,7 @@ InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
      * would form a rectangle whose height is the entire range. */
 
     // Draw axes
-    str += `<path d="M ${axesMargin} 0 v ${graphHeight} h ${axesMargin+graphWidth}$"`
+    str += `<path d="M ${axesMargin} 0 v ${graphHeight} h ${axesMargin+graphWidth}"`
         + ' stroke="white" fill="none" />';
 
     // One axis tick every $10
@@ -372,7 +372,7 @@ InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
         str += `<line x1="${x}" y1="${graphHeight-2}" x2="${x}" y2="${graphHeight+2}" stroke="white" />`;
         // One label every $50
         if(t % 50 === 0) {
-            str += `<text x="${x}" y="${graphHeight+bottomMargin/2}" text-anchor="middle" dominant-baseline="middle" fill="white" font-size="x-small">$${t}</text>`;
+            str += `<text x="${x}" y="${graphHeight+bottomMargin/2}" text-anchor="middle" dominant-baseline="middle" fill="white">$${t}</text>`;
         }
     }
 
@@ -393,7 +393,7 @@ InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
 
     // Draw the name of the stock in the top right corner
     str += `<text x="${graphWidth+axesMargin}" y="${axesMargin}" text-anchor="end"` +
-        ` dominant-baseline="hanging" fill="white" font-size="large">` +
+        ` dominant-baseline="hanging" fill="white" font-size="x-large">` +
         InsugarTrading.minigame.goodsById[goodId].symbol +
         '</text>';
 
@@ -404,7 +404,7 @@ InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
 // Constructs a large image containing the histograms for all stocks
 InsugarTrading.allSVGHistograms = function(bankLevel) {
     let str = '';
-    let innerWidth = 450, innerHeight = 250;
+    let innerWidth = 450, innerHeight = 260;
     str += `<svg width="${5*innerWidth}px" height="${3*innerHeight}px">`;
     str += '<rect width="100%" height="100%" fill="black" />'; // background
     for(let i = 0; i < 3; i++) {
