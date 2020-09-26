@@ -146,9 +146,13 @@ Known Bugs/Limitations
 Only datasets for banks up to level 30 are available
 (although I believe this should be enough for most players).
 
-Currently, the displayed quantiles are not updated if the bank is levelled up.
+Currently, the displayed quantiles are not updated if the bank is leveled up.
 This issue fixes itself with the next tick,
 but the mod displays slightly wrong information before it comes.
+
+Wiping the save and leveling the banks up again
+makes the histogram appear twice in the tooltip.
+Refreshing the page fixes the issue.
 
 License
 =======
