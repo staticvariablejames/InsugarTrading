@@ -401,6 +401,23 @@ InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
     return str;
 }
 
+// Constructs a large image containing the histograms for all stocks
+InsugarTrading.allSVGHistograms = function(bankLevel) {
+    let str = '';
+    let innerWidth = 450, innerHeight = 250;
+    str += `<svg width="${5*innerWidth}px" height="${3*innerHeight}px">`;
+    str += '<rect width="100%" height="100%" fill="black" />'; // background
+    for(let i = 0; i < 3; i++) {
+        for(let j = 0; j < 5; j++) {
+            let goodId = 5*i+j;
+            str += `<svg width="${innerWidth}px" height="${innerHeight}px" x="${j*innerWidth}px" y="${i*innerHeight}px">`;
+            str += InsugarTrading.SVGhistogram(bankLevel, goodId);
+            str += '</svg>';
+        }
+    }
+    str += '</svg>';
+    return str;
+}
 
 
 /****************
