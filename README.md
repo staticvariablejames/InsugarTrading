@@ -106,6 +106,7 @@ or create a bookmarklet with the code
     javascript:(function(){Game.LoadMod('https://staticvariablejames.github.io/InsugarTrading/InsugarTrading.js');}());
 ```
 
+
 Changelog
 =========
 
@@ -140,6 +141,13 @@ This should ease the burden on slower connections and speed up loading the mod.
 
 Minor improvements on the histogram display.
 
+1.2.1
+-----
+
+Fixed bug in which tooltip information would appear twice
+after a wipe save (hard reset).
+
+
 Known Bugs/Limitations
 ======================
 
@@ -150,9 +158,6 @@ Currently, the displayed quantiles are not updated if the bank is leveled up.
 This issue fixes itself with the next tick,
 but the mod displays slightly wrong information before it comes.
 
-Wiping the save and leveling the banks up again
-makes the histogram appear twice in the tooltip.
-Refreshing the page fixes the issue.
 
 License
 =======
