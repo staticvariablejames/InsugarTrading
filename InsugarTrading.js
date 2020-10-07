@@ -532,19 +532,39 @@ InsugarTrading.launch = function() {
     }
 
     CCSE.MinigameReplacer(function(){
+        // These statements require access to the stock market to work
         InsugarTrading.minigame = Game.Objects['Bank'].minigame;
         InsugarTrading.createQuantileRows();
-        Game.customMinigame['Bank'].tick.push(function() {
-            InsugarTrading.customTickCollectData();
-            InsugarTrading.customTickDisplayData();
-        });
-        Game.customMinigame['Bank'].buyGood.push(InsugarTrading.updateQuantileText);
-        Game.customMinigame['Bank'].sellGood.push(InsugarTrading.updateQuantileText);
-        Game.customMinigame['Bank'].goodTooltip.push(InsugarTrading.customGoodTooltip);
 
         InsugarTrading.onDatasetLoad.push(InsugarTrading.customTickDisplayData);
         InsugarTrading.fetchDataset(InsugarTrading.getBankLevel());
     },'Bank');
+
+    /* Technically the following statements also require access to the market
+     * (because the functions we are pushing to lists require access to the market),
+     * but they are only called (by CCSE) if the bank is loaded,
+     * so we don't have to put them inside the MinigameReplacer function above.
+     *
+     * Actually, we should _not_ put them there.
+     * Vanilla Cookie Clicker calls the launch() method of minigames on a hard reset (wipe save),
+     * which means the function above will be called again.
+     * Since we should not push custom tooltips and such twice,
+     * these statements should be outside of the MinigameReplacer function above.
+     */
+    if(!Game.customMinigame['Bank'].tick) Game.customMinigame['Bank'].tick = [];
+    Game.customMinigame['Bank'].tick.push(function() {
+        InsugarTrading.customTickCollectData();
+        InsugarTrading.customTickDisplayData();
+    });
+
+    if(!Game.customMinigame['Bank'].buyGood) Game.customMinigame['Bank'].buyGood = [];
+    Game.customMinigame['Bank'].buyGood.push(InsugarTrading.updateQuantileText);
+
+    if(!Game.customMinigame['Bank'].sellGood) Game.customMinigame['Bank'].sellGood = [];
+    Game.customMinigame['Bank'].sellGood.push(InsugarTrading.updateQuantileText);
+
+    if(!Game.customMinigame['Bank'].goodTooltip) Game.customMinigame['Bank'].goodTooltip = [];
+    Game.customMinigame['Bank'].goodTooltip.push(InsugarTrading.customGoodTooltip);
 
     Game.customStatsMenu.push(function() {
         CCSE.AppendStatsVersionNumber(InsugarTrading.name, InsugarTrading.version);
