@@ -147,6 +147,11 @@ Minor improvements on the histogram display.
 Fixed bug in which tooltip information would appear twice
 after a wipe save (hard reset).
 
+1.2.2
+-----
+
+Use CCSE v2.018.
+
 
 Known Bugs/Limitations
 ======================

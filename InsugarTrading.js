@@ -7,9 +7,9 @@ if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieC
 
 // InsugarTrading.launch is at the end of this file.
 InsugarTrading.name = "Insugar Trading";
-InsugarTrading.version = "1.2.1"; // Semantic versioning
+InsugarTrading.version = "1.2.2"; // Semantic versioning
 InsugarTrading.GameVersion = "2.029";
-InsugarTrading.CCSEVersion = "2.017";
+InsugarTrading.CCSEVersion = "2.018";
 
 /* The data here is just a histogram:
  * data[bankLvl][id][value] is the number of times that the id-th stock
