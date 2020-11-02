@@ -152,6 +152,12 @@ after a wipe save (hard reset).
 
 Use CCSE v2.018.
 
+1.2.3
+-----
+
+Update to Cookie Clicker v2.031.
+The datasets for the new building still need to be computed.
+
 
 Known Bugs/Limitations
 ======================
