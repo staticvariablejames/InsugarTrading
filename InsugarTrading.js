@@ -7,7 +7,7 @@ if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieC
 
 // InsugarTrading.launch is at the end of this file.
 InsugarTrading.name = "Insugar Trading";
-InsugarTrading.version = "1.2.3"; // Semantic versioning
+InsugarTrading.version = "1.2.4"; // Semantic versioning
 InsugarTrading.GameVersion = "2.031";
 InsugarTrading.CCSEVersion = "2.020";
 
