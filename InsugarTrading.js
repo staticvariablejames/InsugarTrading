@@ -351,7 +351,7 @@ InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
 
     let quantileThreshold = 0.99999;
     let upperPriceBound = InsugarTrading.data[bankLevel].map(
-            (_, id) => InsugarTrading.quantile(bankLevel, i, quantileThreshold)
+            (_, id) => InsugarTrading.quantile(bankLevel, id, quantileThreshold)
         ).reduce(
             (a, b) => Math.max(a, b)
         );
