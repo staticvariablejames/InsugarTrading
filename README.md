@@ -163,6 +163,11 @@ The datasets for the new building still need to be computed.
 
 Fix a typo in the histogram generation code.
 
+1.2.5
+-----
+
+Register the mod in the game's modding API.
+
 
 Known Bugs/Limitations
 ======================
