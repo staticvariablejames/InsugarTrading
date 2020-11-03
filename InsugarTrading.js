@@ -204,6 +204,7 @@ InsugarTrading.fastTicker.stopDataCollection = function() {
     window.clearInterval(this.intervalID);
     InsugarTrading.isGatheringData = false;
     InsugarTrading.minigame.secondsPerTick = 60; // undo the kludge
+    InsugarTrading.computePartialSums(InsugarTrading.getBankLevel());
 }
 
 InsugarTrading.datasetToString = function() {
@@ -241,6 +242,10 @@ InsugarTrading.datasetToString = function() {
  * the partial sums are available.
  */
 InsugarTrading.partialSums = [];
+
+/* Compute the partial sums for the given bank level,
+ * overriding the current partialSums data if any.
+ */
 InsugarTrading.computePartialSums = function(lvl) {
     InsugarTrading.partialSums[lvl] = [];
     for(let id in InsugarTrading.data[lvl]) {
