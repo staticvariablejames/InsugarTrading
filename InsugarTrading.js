@@ -525,12 +525,27 @@ InsugarTrading.customTickDisplayData = function() {
  * MOD LAUNCH *
  **************/
 
-InsugarTrading.launch = function() {
-    if(!CCSE.ConfirmGameCCSEVersion(InsugarTrading.name, InsugarTrading.version, InsugarTrading.GameVersion, InsugarTrading.CCSEVersion)) {
-        InsugarTrading.isLoaded = true;
-        return;
-    }
+InsugarTrading.save = function() {
+    /* This is a bit of a kludge to make sure InsugarTrading.load is called,
+     * a bit of disclaiming (to mark saves using this mod),
+     * and a bit of future-proofing in case more data is added to this mod.
+     */
+    return JSON.stringify({version: InsugarTrading.version});
+}
 
+InsugarTrading.load = function(_) {
+    /* In every load,
+     * stockMarket.js first creates a brand new stock market and simulates 15 ticks of it
+     * before overriding the data with what was in the save game.
+     * So we must make sure that InsugarTrading.customTickDisplayData is called after the override.
+     *
+     * Hooks installed by InsugarTrading.init take care of calling this function
+     * if the minigame hasn't loaded yet when InsugarTrading.load() is called.
+     */
+    InsugarTrading.customTickDisplayData();
+}
+
+InsugarTrading.init = function() {
     CCSE.MinigameReplacer(function(){
         // These statements require access to the stock market to work
         InsugarTrading.minigame = Game.Objects['Bank'].minigame;
@@ -552,10 +567,8 @@ InsugarTrading.launch = function() {
      * these statements should be outside of the MinigameReplacer function above.
      */
     if(!Game.customMinigame['Bank'].tick) Game.customMinigame['Bank'].tick = [];
-    Game.customMinigame['Bank'].tick.push(function() {
-        InsugarTrading.customTickCollectData();
-        InsugarTrading.customTickDisplayData();
-    });
+    Game.customMinigame['Bank'].tick.push(InsugarTrading.customTickCollectData);
+    Game.customMinigame['Bank'].tick.push(InsugarTrading.customTickDisplayData);
 
     if(!Game.customMinigame['Bank'].buyGood) Game.customMinigame['Bank'].buyGood = [];
     Game.customMinigame['Bank'].buyGood.push(InsugarTrading.updateQuantileText);
@@ -569,28 +582,19 @@ InsugarTrading.launch = function() {
     Game.customStatsMenu.push(function() {
         CCSE.AppendStatsVersionNumber(InsugarTrading.name, InsugarTrading.version);
     });
-
-    CCSE.customLoad.push(InsugarTrading.customTickDisplayData);
-    /* This is a kludge.
-     * We have to run customTickDisplayData after the invocation of Game.Objects.Bank.minigame.load
-     * (otherwise the wrong values will be displayed)
-     * and there are no hooks that allows us to run this function right after the minigame loads.
-     * It happens that in the current implementation of CCSE,
-     * CCSE.LoadSave is also called after a save game is loaded (by vanilla means),
-     * so the above kludge works.
-     */
-
-    InsugarTrading.isLoaded = true;
 }
 
-// Code copied from CCSE's documentation
 if(!InsugarTrading.isLoaded){
-	if(CCSE && CCSE.isLoaded){
-		InsugarTrading.launch();
-	}
-	else{
-		if(!CCSE) var CCSE = {};
-		if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
-		CCSE.postLoadHooks.push(InsugarTrading.launch);
-	}
+    if(CCSE && CCSE.isLoaded){
+        Game.registerMod('Insugar Trading', InsugarTrading);
+    }
+    else {
+        if(!CCSE) var CCSE = {};
+        if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
+        CCSE.postLoadHooks.push(function() {
+            if(CCSE.ConfirmGameCCSEVersion(InsugarTrading.name, InsugarTrading.version, InsugarTrading.GameVersion, InsugarTrading.CCSEVersion)) {
+                Game.registerMod('Insugar Trading', InsugarTrading);
+            }
+        });
+    }
 }
