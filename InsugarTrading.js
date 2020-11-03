@@ -2,9 +2,7 @@
 
 let InsugarTrading = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE.js');
-// CCSE calls Game.Win('Third-party') for us
 
-// InsugarTrading.launch is at the end of this file.
 InsugarTrading.name = "Insugar Trading";
 InsugarTrading.version = "1.2.4"; // Semantic versioning
 InsugarTrading.GameVersion = "2.031";
@@ -521,7 +519,7 @@ InsugarTrading.customTickDisplayData = function() {
 
 
 /**************
- * MOD LAUNCH *
+ * MODING API *
  **************/
 
 InsugarTrading.save = function() {
@@ -582,6 +580,12 @@ InsugarTrading.init = function() {
         CCSE.AppendStatsVersionNumber(InsugarTrading.name, InsugarTrading.version);
     });
 }
+
+
+
+/********************
+ * Waiting for CCSE *
+ ********************/
 
 if(!InsugarTrading.isLoaded){
     if(CCSE && CCSE.isLoaded){
