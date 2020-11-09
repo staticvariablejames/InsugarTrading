@@ -513,7 +513,7 @@ InsugarTrading.customGoodTooltip = function(id, str) {
     str += '<div class="line"></div>';
     let lvl = InsugarTrading.getBankLevel();
     let currentValue = InsugarTrading.minigame.goodsById[id].val;
-    let additionalLines = [0.25, 0.5, 0.75];
+    let additionalLines = InsugarTrading.settings.quantilesToDisplay;
     if(InsugarTrading.isDataAvailable(lvl, id)) {
         str += InsugarTrading.SVGhistogram(lvl, id, currentValue, additionalLines);
     } else {
@@ -544,19 +544,54 @@ InsugarTrading.customTickDisplayData = function() {
 
 
 
+/******************
+ * User interface *
+ ******************/
+
+InsugarTrading.settings = { // default settings
+    quantilesToDisplay: [0.25, 0.5, 0.75],
+};
+
+InsugarTrading.quantileSliderCallback = function(i) {
+    let value = document.getElementById('InsugarTradingQuantileSlider' + i).value ?? 50;
+    InsugarTrading.settings.quantilesToDisplay[i] = value/100;
+    document.getElementById(`InsugarTradingQuantileSlider${i}RightText`).innerHTML = value + '%';
+}
+
+InsugarTrading.customOptionsMenu = function() {
+    let menuStr = "";
+    for(let i in InsugarTrading.settings.quantilesToDisplay) {
+        menuStr += '<div class="listing">'
+            + Game.WriteSlider(
+                'InsugarTradingQuantileSlider' + i,
+                'Quantile',
+                '[$]%',
+                () => Math.round(InsugarTrading.settings.quantilesToDisplay[i]*100),
+                'InsugarTrading.quantileSliderCallback(' + i + ')'
+            )
+        + '</div>';
+    }
+    CCSE.AppendCollapsibleOptionsMenu("Insugar Trading", menuStr);
+}
+
+
 /**************
  * MODING API *
  **************/
 
 InsugarTrading.save = function() {
-    /* This is a bit of a kludge to make sure InsugarTrading.load is called,
-     * a bit of disclaiming (to mark saves using this mod),
-     * and a bit of future-proofing in case more data is added to this mod.
-     */
-    return JSON.stringify({version: InsugarTrading.version});
+    return JSON.stringify({
+        version: InsugarTrading.version,
+        settings: InsugarTrading.settings,
+    });
 }
 
-InsugarTrading.load = function(_) {
+InsugarTrading.load = function(str) {
+    let obj = JSON.parse(str);
+    if('quantilesToDisplay' in obj.settings) {
+        InsugarTrading.settings.quantilesToDisplay = obj.settings.quantilesToDisplay;
+    }
+
     /* In every load,
      * stockMarket.js first creates a brand new stock market and simulates 15 ticks of it
      * before overriding the data with what was in the save game.
@@ -605,6 +640,8 @@ InsugarTrading.init = function() {
     Game.customStatsMenu.push(function() {
         CCSE.AppendStatsVersionNumber(InsugarTrading.name, InsugarTrading.version);
     });
+
+    Game.customOptionsMenu.push(InsugarTrading.customOptionsMenu);
 }
 
 
