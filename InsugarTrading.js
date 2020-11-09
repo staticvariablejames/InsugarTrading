@@ -351,7 +351,8 @@ InsugarTrading.averagePrice = function(bankLevel, goodId) {
 InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice, additionalLines) {
     if(!InsugarTrading.isDataAvailable(bankLevel, goodId)) return '';
 
-    let graphWidth = 430, graphHeight = 240, axesMargin = 10, bottomMargin = 20;
+    let graphWidth = 430, graphHeight = 240, axesMargin = 15, bottomMargin = 20;
+    if(Array.isArray(additionalLines) && additionalLines.length != 0) bottomMargin += 35;
     let str = `<svg width="${graphWidth+2*axesMargin}px" height="${graphHeight + bottomMargin}px">`;
     // We ignore the top margin
 
@@ -399,6 +400,7 @@ InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice, addition
             let frequency = InsugarTrading.rawFrequency(bankLevel, goodId, Math.floor(10*value));
             let y = (1 - frequency/density)*graphHeight;
             str += `<line x1="${x}" y1="${y}" x2="${x}" y2="${graphHeight}" stroke="white" />`;
+            str += `<text x="${x}" y="${graphHeight+25}" text-anchor="end" transform="rotate(-45 ${x} ${graphHeight+25})" fill="white">$${Math.floor(100*value)/100}</text>`;
         }
     }
 
