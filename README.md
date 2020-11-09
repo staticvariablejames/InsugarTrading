@@ -66,8 +66,11 @@ This add-on modifies the interface to add two bits of information to the stock m
 
 First,
 it modifies the tooltip for the stock market goods
-to display the histogram for that specific good,
-along with a vertical orange line pointing to the current good price.
+to display the histogram for that specific good.
+The orange line is the current value of the good.
+The three white lines are the 25%, 50%, and 75% percentiles,
+so, for example, the first quartile for SLT is at $31.81.
+The quantiles can be customized in the settings.
 
 Second,
 it adds a bar between the current stock value and the amount that stock owned.
@@ -75,8 +78,8 @@ It displays the quantile of that stock value,
 compared to the dataset.
 For example,
 in the picture above,
-HNY is worth $132.57 and its quantile is 74.09%;
-this means that HNY was at or below $132.57 in 74.09% of the time during the simulation.
+SLT is worth $60.71 and its quantile is 62.78%;
+this means that HNY was at or below $60.71 in 62.78% of the time during the simulation.
 
 The color of text ranges from gray to orange:
 it is orange for stocks that you don't currently own and are at a low price (quantile-wise),
