@@ -558,19 +558,39 @@ InsugarTrading.quantileSliderCallback = function(i) {
     document.getElementById(`InsugarTradingQuantileSlider${i}RightText`).innerHTML = value + '%';
 }
 
+// Makes a slider for index i of InsugarTrading.settings.quantilesToDisplay
+InsugarTrading.makeQuantileSlider = function(i) {
+    return Game.WriteSlider(
+        'InsugarTradingQuantileSlider' + i,
+        'Quantile',
+        '[$]%',
+        () => Math.round(InsugarTrading.settings.quantilesToDisplay[i]*100),
+        'InsugarTrading.quantileSliderCallback(' + i + ')'
+    );
+}
+
+InsugarTrading.eraseQuantileSlider = function(i) {
+    InsugarTrading.settings.quantilesToDisplay.splice(i, 1);
+    Game.UpdateMenu();
+}
+
 InsugarTrading.customOptionsMenu = function() {
     let menuStr = "";
-    for(let i in InsugarTrading.settings.quantilesToDisplay) {
-        menuStr += '<div class="listing">'
-            + Game.WriteSlider(
-                'InsugarTradingQuantileSlider' + i,
-                'Quantile',
-                '[$]%',
-                () => Math.round(InsugarTrading.settings.quantilesToDisplay[i]*100),
-                'InsugarTrading.quantileSliderCallback(' + i + ')'
-            )
-        + '</div>';
+    let i = 0;
+    for(i in InsugarTrading.settings.quantilesToDisplay) {
+        menuStr += '<div class="listing">' +
+            InsugarTrading.makeQuantileSlider(i) +
+            `<div style="display:inline; vertical-align:top;">
+                <a class="option" onclick="InsugarTrading.eraseQuantileSlider(${i});">Remove</a>
+            </div>` +
+        '</div>';
     }
+
+    let length = InsugarTrading.settings.quantilesToDisplay.length;
+    let onclick = `InsugarTrading.settings.quantilesToDisplay[${length}] = 0.5`;
+    menuStr += `<div class="listing">
+        <a class="option" onclick="${onclick};Game.UpdateMenu()">Add quantile</a>
+        </div>`;
     CCSE.AppendCollapsibleOptionsMenu("Insugar Trading", menuStr);
 }
 
