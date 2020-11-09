@@ -171,6 +171,13 @@ Fix a typo in the histogram generation code.
 
 Register the mod in the game's modding API.
 
+1.3.0
+-----
+
+Minor change in graph style.
+
+The graph now has vertical lines displaying specific quantiles.
+
 
 Known Bugs/Limitations
 ======================
