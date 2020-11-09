@@ -385,12 +385,14 @@ InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
         let barHeight = InsugarTrading.rawFrequency(bankLevel, goodId, i)/density*graphHeight;
         str += 'V ' + (graphHeight - barHeight) + ' ';
     }
-    str += ' Z" fill="cyan" />';
+    str += ' Z" fill="steelblue" />';
 
     // Draw an orange line with the current price
     if(currentPrice) {
         let x = currentPrice/upperPriceBound * graphWidth + axesMargin;
-        str += `<line x1="${x}" y1="0" x2="${x}" y2="${graphHeight}" stroke="orange" />`;
+        let frequency = InsugarTrading.rawFrequency(bankLevel, goodId, Math.floor(10*currentPrice));
+        let y = (1 - frequency/density)*graphHeight;
+        str += `<line x1="${x}" y1="${y}" x2="${x}" y2="${graphHeight}" stroke="orange" stroke-width="3px"/>`;
     }
 
     //  // Draw the name of the stock in the top right corner
