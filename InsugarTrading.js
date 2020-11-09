@@ -610,7 +610,7 @@ InsugarTrading.save = function() {
 
 InsugarTrading.load = function(str) {
     let obj = JSON.parse(str);
-    if('quantilesToDisplay' in obj.settings) {
+    if('quantilesToDisplay' in obj.settings ?? {}) {
         InsugarTrading.settings.quantilesToDisplay = obj.settings.quantilesToDisplay;
     }
 
