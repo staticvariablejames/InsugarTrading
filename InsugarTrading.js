@@ -342,9 +342,13 @@ InsugarTrading.averagePrice = function(bankLevel, goodId) {
 
 /* Constructs a string containing the SVG code for a histogram for the given good.
  *
+ * If currentPrice is present, generates an orange vertical line at that value.
+ * If additionalLines is present and is a list of numbers between 0 and 1,
+ *  each number is considered a quantile and one vertical line is generated for each.
+ *
  * Returns '' if no data is available.
  */
-InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
+InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice, additionalLines) {
     if(!InsugarTrading.isDataAvailable(bankLevel, goodId)) return '';
 
     let graphWidth = 430, graphHeight = 240, axesMargin = 10, bottomMargin = 20;
@@ -374,7 +378,7 @@ InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
         str += `<line x1="${x}" y1="${graphHeight-2}" x2="${x}" y2="${graphHeight+2}" stroke="white" />`;
         // One label every $50
         if(t % 50 === 0) {
-            str += `<text x="${x}" y="${graphHeight+bottomMargin/2}" text-anchor="middle" dominant-baseline="middle" fill="white">$${t}</text>`;
+            str += `<text x="${x}" y="${graphHeight+10}" text-anchor="middle" dominant-baseline="middle" fill="white">$${t}</text>`;
         }
     }
 
@@ -387,7 +391,20 @@ InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice) {
     }
     str += ' Z" fill="steelblue" />';
 
-    // Draw an orange line with the current price
+    // Draw each additional line
+    if(Array.isArray(additionalLines)) {
+        for(quantile of additionalLines) {
+            let value = InsugarTrading.quantile(bankLevel, goodId, quantile);
+            let x = value/upperPriceBound * graphWidth + axesMargin;
+            let frequency = InsugarTrading.rawFrequency(bankLevel, goodId, Math.floor(10*value));
+            let y = (1 - frequency/density)*graphHeight;
+            str += `<line x1="${x}" y1="${y}" x2="${x}" y2="${graphHeight}" stroke="white" />`;
+        }
+    }
+
+    /* Draw an orange line with the current price
+     * Must be drawn last to not be under the adittional lines
+     */
     if(currentPrice) {
         let x = currentPrice/upperPriceBound * graphWidth + axesMargin;
         let frequency = InsugarTrading.rawFrequency(bankLevel, goodId, Math.floor(10*currentPrice));
@@ -495,8 +512,10 @@ InsugarTrading.updateQuantileText = function(id) {
 InsugarTrading.customGoodTooltip = function(id, str) {
     str += '<div class="line"></div>';
     let lvl = InsugarTrading.getBankLevel();
+    let currentValue = InsugarTrading.minigame.goodsById[id].val;
+    let additionalLines = [0.25, 0.5, 0.75];
     if(InsugarTrading.isDataAvailable(lvl, id)) {
-        str += InsugarTrading.SVGhistogram(lvl, id, InsugarTrading.minigame.goodsById[id].val);
+        str += InsugarTrading.SVGhistogram(lvl, id, currentValue, additionalLines);
     } else {
         str += 'InsugarTrading: No data available.';
     }
