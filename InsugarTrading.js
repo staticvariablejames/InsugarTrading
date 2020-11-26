@@ -346,11 +346,13 @@ InsugarTrading.averagePrice = function(bankLevel, goodId) {
  * If additionalLines is a list of numbers between 0 and 1;
  *  each number is considered a quantile and one vertical line is generated for each.
  * If displayName is true, the name of the stock is displayed in the top right corner.
+ * If forceUpperBound is present, the histogram price axis will range from 0 to forceUpperBound;
+ *  otherwise, the upper bound will be the highest 99.999% of all goods.
  *
  * Returns '' if no data is available.
  */
 InsugarTrading.SVGHistogram = function(bankLevel, goodId,
-    {currentPrice = null, additionalLines = [], displayName = false})
+    {currentPrice = null, additionalLines = [], displayName = false, forceUpperBound = null})
 {
     if(!InsugarTrading.isDataAvailable(bankLevel, goodId)) return '';
 
@@ -360,11 +362,14 @@ InsugarTrading.SVGHistogram = function(bankLevel, goodId,
     // We ignore the top margin
 
     let quantileThreshold = 0.99999;
-    let upperPriceBound = InsugarTrading.data[bankLevel].map(
-            (_, id) => InsugarTrading.quantile(bankLevel, id, quantileThreshold)
-        ).reduce(
-            (a, b) => Math.max(a, b)
-        );
+    let upperPriceBound = forceUpperBound;
+    if(!forceUpperBound) {
+        upperPriceBound = InsugarTrading.data[bankLevel].map(
+                (_, id) => InsugarTrading.quantile(bankLevel, id, quantileThreshold)
+            ).reduce(
+                (a, b) => Math.max(a, b)
+            );
+    }
     // This way, every graph has the same scale and nicely fits between 0 and upperPriceBound.
 
     let entryCount = InsugarTrading.data[bankLevel][goodId].length;
@@ -428,7 +433,7 @@ InsugarTrading.SVGHistogram = function(bankLevel, goodId,
 }
 
 // Constructs a large image containing the histograms for all stocks
-InsugarTrading.allSVGHistograms = function(bankLevel) {
+InsugarTrading.allSVGHistograms = function(bankLevel, forceUpperBound) {
     let additionalLines = InsugarTrading.settings.quantilesToDisplay;
     let displayName = true;
     let innerWidth = 450, innerHeight = 260;
@@ -441,7 +446,7 @@ InsugarTrading.allSVGHistograms = function(bankLevel) {
         for(let j = 0; j < 4; j++) {
             let goodId = 4*i+j;
             str += `<svg width="${innerWidth}px" height="${innerHeight}px" x="${j*innerWidth}px" y="${i*innerHeight}px">`;
-            str += InsugarTrading.SVGHistogram(bankLevel, goodId, {displayName, additionalLines});
+            str += InsugarTrading.SVGHistogram(bankLevel, goodId, {displayName, additionalLines, forceUpperBound});
             str += '</svg>';
         }
     }
@@ -454,8 +459,8 @@ InsugarTrading.allSVGHistograms = function(bankLevel) {
 }
 
 // Utility to save the histograms from the above
-InsugarTrading.saveSVGHistograms = function(bankLevel) {
-    let svg = InsugarTrading.allSVGHistograms(bankLevel);
+InsugarTrading.saveSVGHistograms = function(bankLevel, forceUpperBound) {
+    let svg = InsugarTrading.allSVGHistograms(bankLevel, forceUpperBound);
     let blob = new Blob([svg],{type:'image/svg+xml'});
     saveAs(blob, `lvl${bankLevel}.svg`);
 }
