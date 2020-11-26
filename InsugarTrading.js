@@ -25,7 +25,7 @@ InsugarTrading.data = [null];
 InsugarTrading.datasetUrl = function(bankLevel) {
     return 'https://staticvariablejames.github.io/InsugarTrading/data/lvl' + bankLevel + '.js';
 }
-InsugarTrading.highestAvailableDatasetLevel = 30;
+InsugarTrading.highestAvailableDatasetLevel = 50;
 
 /* Downloads a dataset from the github website.
  *
