@@ -349,7 +349,7 @@ InsugarTrading.averagePrice = function(bankLevel, goodId) {
  *
  * Returns '' if no data is available.
  */
-InsugarTrading.SVGhistogram = function(bankLevel, goodId,
+InsugarTrading.SVGHistogram = function(bankLevel, goodId,
     {currentPrice = null, additionalLines = [], displayName = false})
 {
     if(!InsugarTrading.isDataAvailable(bankLevel, goodId)) return '';
@@ -437,7 +437,7 @@ InsugarTrading.allSVGHistograms = function(bankLevel) {
         for(let j = 0; j < 5; j++) {
             let goodId = 5*i+j;
             str += `<svg width="${innerWidth}px" height="${innerHeight}px" x="${j*innerWidth}px" y="${i*innerHeight}px">`;
-            str += InsugarTrading.SVGhistogram(bankLevel, goodId);
+            str += InsugarTrading.SVGHistogram(bankLevel, goodId, {displayName:true});
             str += '</svg>';
         }
     }
@@ -520,7 +520,7 @@ InsugarTrading.customGoodTooltip = function(id, str) {
     let currentValue = InsugarTrading.minigame.goodsById[id].val;
     let additionalLines = InsugarTrading.settings.quantilesToDisplay;
     if(InsugarTrading.isDataAvailable(lvl, id)) {
-        str += InsugarTrading.SVGhistogram(lvl, id, {currentValue, additionalLines});
+        str += InsugarTrading.SVGHistogram(lvl, id, {currentValue, additionalLines});
     } else {
         str += 'InsugarTrading: No data available.';
     }
