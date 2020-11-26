@@ -178,6 +178,16 @@ Minor change in graph style.
 
 The graph now has vertical lines displaying specific quantiles.
 
+1.3.1
+-----
+
+Datasets replaced with datasets computed with
+[Cookie Clicker C++ Tools](https://github.com/staticvariablejames/CookieClickerCppTools).
+This means that bank levels between 1 and 50 are available,
+including Subsidiaries (Idleverses).
+
+Some internal changes.
+
 
 Known Bugs/Limitations
 ======================
