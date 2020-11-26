@@ -343,16 +343,19 @@ InsugarTrading.averagePrice = function(bankLevel, goodId) {
 /* Constructs a string containing the SVG code for a histogram for the given good.
  *
  * If currentPrice is present, generates an orange vertical line at that value.
- * If additionalLines is present and is a list of numbers between 0 and 1,
+ * If additionalLines is a list of numbers between 0 and 1;
  *  each number is considered a quantile and one vertical line is generated for each.
+ * If displayName is true, the name of the stock is displayed in the top right corner.
  *
  * Returns '' if no data is available.
  */
-InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice, additionalLines) {
+InsugarTrading.SVGhistogram = function(bankLevel, goodId,
+    {currentPrice = null, additionalLines = [], displayName = false})
+{
     if(!InsugarTrading.isDataAvailable(bankLevel, goodId)) return '';
 
     let graphWidth = 430, graphHeight = 240, axesMargin = 15, bottomMargin = 20;
-    if(Array.isArray(additionalLines) && additionalLines.length != 0) bottomMargin += 35;
+    if(additionalLines.length != 0) bottomMargin += 35;
     let str = `<svg width="${graphWidth+2*axesMargin}px" height="${graphHeight + bottomMargin}px">`;
     // We ignore the top margin
 
@@ -393,15 +396,13 @@ InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice, addition
     str += ' Z" fill="steelblue" />';
 
     // Draw each additional line
-    if(Array.isArray(additionalLines)) {
-        for(quantile of additionalLines) {
-            let value = InsugarTrading.quantile(bankLevel, goodId, quantile);
-            let x = value/upperPriceBound * graphWidth + axesMargin;
-            let frequency = InsugarTrading.rawFrequency(bankLevel, goodId, Math.floor(10*value));
-            let y = (1 - frequency/density)*graphHeight;
-            str += `<line x1="${x}" y1="${y}" x2="${x}" y2="${graphHeight}" stroke="white" />`;
-            str += `<text x="${x}" y="${graphHeight+25}" text-anchor="end" transform="rotate(-45 ${x} ${graphHeight+25})" fill="white">$${Math.floor(100*value)/100}</text>`;
-        }
+    for(quantile of additionalLines) {
+        let value = InsugarTrading.quantile(bankLevel, goodId, quantile);
+        let x = value/upperPriceBound * graphWidth + axesMargin;
+        let frequency = InsugarTrading.rawFrequency(bankLevel, goodId, Math.floor(10*value));
+        let y = (1 - frequency/density)*graphHeight;
+        str += `<line x1="${x}" y1="${y}" x2="${x}" y2="${graphHeight}" stroke="white" />`;
+        str += `<text x="${x}" y="${graphHeight+25}" text-anchor="end" transform="rotate(-45 ${x} ${graphHeight+25})" fill="white">$${Math.floor(100*value)/100}</text>`;
     }
 
     /* Draw an orange line with the current price
@@ -414,11 +415,13 @@ InsugarTrading.SVGhistogram = function(bankLevel, goodId, currentPrice, addition
         str += `<line x1="${x}" y1="${y}" x2="${x}" y2="${graphHeight}" stroke="orange" stroke-width="3px"/>`;
     }
 
-    //  // Draw the name of the stock in the top right corner
-    //  str += `<text x="${graphWidth+axesMargin}" y="${axesMargin}" text-anchor="end"` +
-    //      ` dominant-baseline="hanging" fill="white" font-size="x-large">` +
-    //      InsugarTrading.minigame.goodsById[goodId].symbol +
-    //      '</text>';
+    // Draw the name of the stock in the top right corner
+    if(displayName) {
+        str += `<text x="${graphWidth+axesMargin}" y="${axesMargin}" text-anchor="end"` +
+            ` dominant-baseline="hanging" fill="white" font-size="x-large">` +
+            InsugarTrading.minigame.goodsById[goodId].symbol +
+            '</text>';
+    }
 
     str += '</svg>';
     return str;
@@ -517,7 +520,7 @@ InsugarTrading.customGoodTooltip = function(id, str) {
     let currentValue = InsugarTrading.minigame.goodsById[id].val;
     let additionalLines = InsugarTrading.settings.quantilesToDisplay;
     if(InsugarTrading.isDataAvailable(lvl, id)) {
-        str += InsugarTrading.SVGhistogram(lvl, id, currentValue, additionalLines);
+        str += InsugarTrading.SVGhistogram(lvl, id, {currentValue, additionalLines});
     } else {
         str += 'InsugarTrading: No data available.';
     }
