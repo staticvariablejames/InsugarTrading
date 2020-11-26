@@ -453,6 +453,13 @@ InsugarTrading.allSVGHistograms = function(bankLevel) {
     return str;
 }
 
+// Utility to save the histograms from the above
+InsugarTrading.saveSVGHistograms = function(bankLevel) {
+    let svg = InsugarTrading.allSVGHistograms(bankLevel);
+    let blob = new Blob([svg],{type:'image/svg+xml'});
+    saveAs(blob, `lvl${bankLevel}.svg`);
+}
+
 
 /****************
  * DATA DISPLAY *
