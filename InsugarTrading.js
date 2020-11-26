@@ -429,19 +429,23 @@ InsugarTrading.SVGHistogram = function(bankLevel, goodId,
 
 // Constructs a large image containing the histograms for all stocks
 InsugarTrading.allSVGHistograms = function(bankLevel) {
-    let str = '';
+    let additionalLines = InsugarTrading.settings.quantilesToDisplay;
+    let displayName = true;
     let innerWidth = 450, innerHeight = 260;
-    str += `<svg width="${5*innerWidth}px" height="${3*innerHeight+40}px">`;
+    if(additionalLines.length > 0) innerHeight += 35;
+
+    let str = '';
+    str += `<svg width="${4*innerWidth}px" height="${4*innerHeight+40}px">`;
     str += '<rect width="100%" height="100%" fill="black" />'; // background
-    for(let i = 0; i < 3; i++) {
-        for(let j = 0; j < 5; j++) {
-            let goodId = 5*i+j;
+    for(let i = 0; i < 4; i++) {
+        for(let j = 0; j < 4; j++) {
+            let goodId = 4*i+j;
             str += `<svg width="${innerWidth}px" height="${innerHeight}px" x="${j*innerWidth}px" y="${i*innerHeight}px">`;
-            str += InsugarTrading.SVGHistogram(bankLevel, goodId, {displayName:true});
+            str += InsugarTrading.SVGHistogram(bankLevel, goodId, {displayName, additionalLines});
             str += '</svg>';
         }
     }
-    str += `<text x="20px" y="${3*innerHeight+20}px" ` +
+    str += `<text x="20px" y="${4*innerHeight+20}px" ` +
         'dominant-baseline="middle" fill="white" font-size="32px">' +
         'Bank level ' + bankLevel +
         '</text>';
