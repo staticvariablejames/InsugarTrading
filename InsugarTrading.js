@@ -342,7 +342,7 @@ InsugarTrading.averagePrice = function(bankLevel, goodId) {
 
 /* Constructs a string containing the SVG code for a histogram for the given good.
  *
- * If currentPrice is present, generates an orange vertical line at that value.
+ * If currentValue is present, generates an orange vertical line at that value.
  * If additionalLines is a list of numbers between 0 and 1;
  *  each number is considered a quantile and one vertical line is generated for each.
  * If displayName is true, the name of the stock is displayed in the top right corner.
@@ -352,7 +352,7 @@ InsugarTrading.averagePrice = function(bankLevel, goodId) {
  * Returns '' if no data is available.
  */
 InsugarTrading.SVGHistogram = function(bankLevel, goodId,
-    {currentPrice = null, additionalLines = [], displayName = false, forceUpperBound = null})
+    {currentValue = null, additionalLines = [], displayName = false, forceUpperBound = null})
 {
     if(!InsugarTrading.isDataAvailable(bankLevel, goodId)) return '';
 
@@ -413,9 +413,9 @@ InsugarTrading.SVGHistogram = function(bankLevel, goodId,
     /* Draw an orange line with the current price
      * Must be drawn last to not be under the adittional lines
      */
-    if(currentPrice) {
-        let x = currentPrice/upperPriceBound * graphWidth + axesMargin;
-        let frequency = InsugarTrading.rawFrequency(bankLevel, goodId, Math.floor(10*currentPrice));
+    if(currentValue) {
+        let x = currentValue/upperPriceBound * graphWidth + axesMargin;
+        let frequency = InsugarTrading.rawFrequency(bankLevel, goodId, Math.floor(10*currentValue));
         let y = (1 - frequency/density)*graphHeight;
         str += `<line x1="${x}" y1="${y}" x2="${x}" y2="${graphHeight}" stroke="orange" stroke-width="3px"/>`;
     }
