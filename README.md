@@ -188,6 +188,11 @@ including Subsidiaries (Idleverses).
 
 Some internal changes.
 
+1.3.2
+-----
+
+Fixed a typo that ate the orange line in the histogram.
+
 
 Known Bugs/Limitations
 ======================
