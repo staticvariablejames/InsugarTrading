@@ -683,6 +683,8 @@ InsugarTrading.init = function() {
     });
 
     Game.customOptionsMenu.push(InsugarTrading.customOptionsMenu);
+
+    Game.Notify('Insugar Trading loaded!', '', '', 1, 1);
 }
 
 
