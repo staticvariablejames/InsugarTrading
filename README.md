@@ -198,6 +198,11 @@ Fixed a typo that ate the orange line in the histogram.
 
 Update to CCSE 2.021 and display a notification on load.
 
+1.3.4
+-----
+
+Update to CCSE 2.023.
+
 
 Known Bugs/Limitations
 ======================
