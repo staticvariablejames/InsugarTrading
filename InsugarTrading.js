@@ -4,7 +4,7 @@ let InsugarTrading = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE.js');
 
 InsugarTrading.name = "Insugar Trading";
-InsugarTrading.version = "1.3.3"; // Semantic versioning
+InsugarTrading.version = "1.3.4"; // Semantic versioning
 InsugarTrading.GameVersion = "2.031";
 InsugarTrading.CCSEVersion = "2.023";
 
@@ -24,6 +24,7 @@ InsugarTrading.data = [null];
 
 InsugarTrading.datasetUrl = function(bankLevel) {
     return 'https://staticvariablejames.github.io/InsugarTrading/data/lvl' + bankLevel + '.js';
+    //return 'InsugarTrading/data/lvl' + bankLevel + '.js';
 }
 InsugarTrading.highestAvailableDatasetLevel = 50;
 
