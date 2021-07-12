@@ -25,7 +25,7 @@ which tracks how many times each stock had a given value,
 with a $0.10 precision.
 
 Since the bank level influences the stock values,
-I simulated for bank levels between 1 and 30
+I simulated for bank levels between 1 and 50
 (which I believe to be the most common levels).
 So the dataset actually has 450 histograms,
 one for each bank level and each stock.
@@ -88,7 +88,7 @@ and is also orange for stocks you currently own that are at a high price,
 suggesting you might want to sell those stocks.
 The color is grayer the less true those statements are.
 
-(These statistics are currently available only if the bank level is at most 30.)
+(These statistics are currently available only if the bank level is at most 50.)
 
 
 Using the mod
@@ -207,7 +207,7 @@ Update to CCSE 2.023.
 Known Bugs/Limitations
 ======================
 
-Only datasets for banks up to level 30 are available
+Only datasets for banks up to level 50 are available
 (although I believe this should be enough for most players).
 
 Currently, the displayed quantiles are not updated if the bank is leveled up.
