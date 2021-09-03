@@ -203,6 +203,11 @@ Update to CCSE 2.021 and display a notification on load.
 
 Update to CCSE 2.023.
 
+1.3.5
+-----
+
+Update to CCSE 2.025.
+
 
 Known Bugs/Limitations
 ======================
