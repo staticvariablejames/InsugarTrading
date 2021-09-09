@@ -1,0 +1,22 @@
+{
+  "name": "insugar-trading",
+  "version": "1.3.6",
+  "description": "Cookie Clicker add-on for stock market analytics",
+  "main": "InsugarTrading.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/staticvariablejames/InsugarTrading.git"
+  },
+  "author": "Static Variable James",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/staticvariablejames/InsugarTrading/issues"
+  },
+  "homepage": "https://github.com/staticvariablejames/InsugarTrading#readme"
+}
