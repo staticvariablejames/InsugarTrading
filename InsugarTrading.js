@@ -701,7 +701,7 @@ if(!InsugarTrading.isLoaded){
         if(!CCSE) var CCSE = {};
         if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
         CCSE.postLoadHooks.push(function() {
-            if(CCSE.ConfirmGameCCSEVersion(InsugarTrading.name, InsugarTrading.version, InsugarTrading.GameVersion, InsugarTrading.CCSEVersion)) {
+            if(CCSE.ConfirmGameVersion(InsugarTrading.name, InsugarTrading.version, InsugarTrading.GameVersion, InsugarTrading.CCSEVersion)) {
                 Game.registerMod('Insugar Trading', InsugarTrading);
             }
         });
