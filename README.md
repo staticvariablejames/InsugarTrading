@@ -208,6 +208,17 @@ Update to CCSE 2.023.
 
 Update to CCSE 2.025.
 
+1.3.6
+-----
+
+Update to CCSE 2.026.
+
+The mod won't check the CCSE version anymore.
+(Reasoning: currently CCSE updates far more frequently that Choose Your Own Lump,
+and usually in a backwards-compatible manner.
+Not asking CCSE version every time makes the mod a bit more future-proof.)
+
+
 
 Known Bugs/Limitations
 ======================
