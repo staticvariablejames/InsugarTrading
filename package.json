@@ -18,5 +18,12 @@
   "bugs": {
     "url": "https://github.com/staticvariablejames/InsugarTrading/issues"
   },
-  "homepage": "https://github.com/staticvariablejames/InsugarTrading#readme"
+  "homepage": "https://github.com/staticvariablejames/InsugarTrading#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.14.1",
+    "@types/cookieclicker": "^2.31.5",
+    "cookie-connoisseur": "0.2.0",
+    "playwright": "^1.14.1",
+    "typescript": "^4.4.2"
+  }
 }
