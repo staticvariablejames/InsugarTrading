@@ -1,0 +1,14 @@
+{
+    "localFiles": [
+        {"url": "https://staticvariablejames.github.io/InsugarTrading/InsugarTrading.js",
+         "path": "./InsugarTrading.js"}
+    ],
+    "customURLs": [
+        {"url": "https://klattmose.github.io/CookieClicker/CCSE.js"},
+        {"url": "https://klattmose.github.io/CookieClicker/img/CCSEicon.png"}
+    ],
+    "localDirectories": [
+        {"url": "https://staticvariablejames.github.io/InsugarTrading/data/",
+         "path": "./data/"}
+    ]
+}
