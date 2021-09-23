@@ -9,6 +9,7 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "declaration": true
   }
 }
