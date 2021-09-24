@@ -218,6 +218,16 @@ The mod won't check the CCSE version anymore.
 and usually in a backwards-compatible manner.
 Not asking CCSE version every time makes the mod a bit more future-proof.)
 
+Unreleased
+----------
+
+Internal: Removal of tools for generating the dataset in-game.
+The existence of [CCCPP](https://github.com/staticvariablejames/CookieClickerCppTools)
+makes them redundant for vanilla Stock market,
+and if it is ever needed for modded content,
+it should be rewritten using e.g. [Playwright](https://playwright.dev/)
+or [Cookie Connoisseur](https://github.com/staticvariablejames/cookie-connoisseur).
+
 
 
 Known Bugs/Limitations

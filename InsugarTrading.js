@@ -58,11 +58,6 @@ InsugarTrading.fetchDataset = function(bankLevel) {
 
 InsugarTrading.minigame = null; // Set to Game.Objects['Bank'].minigame on InsugarTrading.launch()
 
-InsugarTrading.isGatheringData = false;
-/* isGatheringData is managed by the Data Gathering part of the mod.
- * In short, data should not be accessed while isGatheringData is true.
- */
-
 // Utility accessor functions
 InsugarTrading.getBankLevel = function() {
     if(InsugarTrading.minigame) {
@@ -81,8 +76,6 @@ InsugarTrading.getGoodsCount = function() {
  * Returns false otherwise.
  */
 InsugarTrading.isDataAvailable = function(bankLevel, goodId) {
-    if(InsugarTrading.isGatheringData)
-        return false;
     if(!(bankLevel in InsugarTrading.data)) {
         InsugarTrading.fetchDataset(bankLevel);
         return false;
@@ -108,123 +101,6 @@ InsugarTrading.rawFrequency = function(bankLevel, goodId, value) {
 
 
 
-/******************
- * DATA GATHERING *
- ******************/
-
-/* Increases the value of InsugarTrading.data[bankLevel][goodId][value] by one,
- * taking care to create the necessary array entries if needed.
- *
- * The intermediary arrays InsugarTrading.data and InsugarTrading.data[lvl] may be sparse,
- * but InsugarTrading.data[lvl][id] will be filled with zeros to mantain density.
- */
-InsugarTrading.incrementFrequency = function(bankLevel, goodId, value) {
-    if(InsugarTrading.data.length <= bankLevel)
-        InsugarTrading.data[bankLevel] = [];
-    if(InsugarTrading.data[bankLevel].length <= goodId)
-        InsugarTrading.data[bankLevel][goodId] = [];
-
-    for(let v = InsugarTrading.data[bankLevel][goodId].length; v <= value; v++)
-        InsugarTrading.data[bankLevel][goodId][v] = 0;
-
-    InsugarTrading.data[bankLevel][goodId][value]++;
-}
-
-/* InsugarTrading.launch() makes sure this function runs every time the stock market ticks. */
-InsugarTrading.customTickCollectData = function() {
-    if(!InsugarTrading.isGatheringData) return;
-    for(let id = 0; id < InsugarTrading.getGoodsCount(); id++) {
-        let value = InsugarTrading.minigame.goodsById[id].val;
-        value = Math.floor(10*value);
-        InsugarTrading.incrementFrequency(InsugarTrading.getBankLevel(), id, value);
-    }
-}
-
-/* Makeshift tool to tick the stock market more often than what the game could normally do.
- * InsugarTrading.isGatheringData is set to true while the fast ticker is running;
- * during this period, InsugarTrading.data will be changed, so it shouldn't be queried.
- * Once ticks >= tickTarget,
- * InsugarTrading.isGatheringData is set back to false
- * and the fast ticking stops.
- */
-InsugarTrading.fastTicker = {};
-InsugarTrading.fastTicker.ticks = 0; // Number of ticks already seen
-InsugarTrading.fastTicker.tickTarget = Infinity; // Data collection ends when ticks === tickTarget
-InsugarTrading.fastTicker.ticksPerCall = 100;
-InsugarTrading.fastTicker.intervalID = undefined;
-
-/* Collects data for the given number of ticks.
- * The data is aggregated to the current dataset.
- */
-InsugarTrading.fastTicker.collectData = function(tickTarget, discardCurrentDataset) {
-    if(discardCurrentDataset) InsugarTrading.data = [null];
-    // InsugarTrading.fastTicker.incrementFrequency takes care of filling the blanks
-
-    this.tickTarget = tickTarget;
-    this.ticks = 0;
-    InsugarTrading.isGatheringData = true;
-
-    InsugarTrading.minigame.secondsPerTick = 1e300; // kludge
-    /* Setting secondsPerTick to a very large number
-     * effectively prevents the stock market from ticking "naturally" again.
-     * The goal is to prevent issues with reentrancy,
-     * i.e. the natural tick being interrupted by a forced tick from this object.
-     * (I don't even know if this is a possibility with Javascript
-     * but I wanted to be sure.)
-     *
-     * We undo this in this.stop().
-     */
-
-    this.intervalID = window.setInterval(this.tickSeveralTimes.bind(this), 1000);
-}
-
-InsugarTrading.fastTicker.tickSeveralTimes = function() {
-    let beginTime = Date.now();
-    for(let i = 0; i < this.ticksPerCall; i++) {
-        InsugarTrading.minigame.tick();
-        this.ticks++;
-        if(this.ticks >= this.tickTarget) {
-            this.stopDataCollection();
-            return;
-        }
-    }
-    let endTime = Date.now();
-    if(endTime - beginTime < 800) { // less than 800ms
-        this.ticksPerCall *= 1.2; // speed up
-        /* I don't know beforehand how fast we can tick the minigame.
-         * This is a simple way of maximizing for speed without guessing.
-         */
-    }
-
-    console.log("Progress: " + (100*this.ticks/this.tickTarget) + "%");
-}
-
-InsugarTrading.fastTicker.stopDataCollection = function() {
-    // Reset stuff
-    window.clearInterval(this.intervalID);
-    InsugarTrading.isGatheringData = false;
-    InsugarTrading.minigame.secondsPerTick = 60; // undo the kludge
-    InsugarTrading.computePartialSums(InsugarTrading.getBankLevel());
-}
-
-InsugarTrading.datasetToString = function() {
-    // Essentially returns InsugarTradingData.js.
-    let str = '';
-    for(let lvl in InsugarTrading.data) {
-        if(lvl == 0) continue; // == instead of === because lvl is actually a string
-        if(lvl != 1) str += '\n';
-
-        str += 'InsugarTrading.data[' + lvl + '] = [];\n';
-        for(let id in InsugarTrading.data[lvl]) {
-            str += 'InsugarTrading.data[' + lvl + '][' + id + '] = [' +
-                InsugarTrading.data[lvl][id].join(',') + '];\n';
-        }
-    }
-
-    return str;
-}
-
-
 /****************************
  * DATA PROCESSING/ANALYSIS *
  ****************************/
@@ -238,7 +114,6 @@ InsugarTrading.datasetToString = function() {
  *
  * It is computed by InsugarTrading.computePartialSums right after the dataset is loaded,
  * so whenever InsugarTrading.isDataAvailable(lvl, id) is true
- * (and no data was collected in this session)
  * the partial sums are available.
  */
 InsugarTrading.partialSums = [];
@@ -550,14 +425,6 @@ InsugarTrading.customTickDisplayData = function() {
      * if the bank minigame hasn't loaded yet.
      */
 
-    if(InsugarTrading.isGatheringData) return;
-    /* InsugarTrading.updateQuantileText manipulates the DOM
-     * regardless of whether the data is available or not.
-     * If this check was missing, that would meant thousands of DOM manipulations per second,
-     * which significantly slows down data collection
-     * (a factor of 5 in my experiments).
-     */
-
     for(let i = 0; i < InsugarTrading.minigame.goodsById.length; i++) {
         InsugarTrading.updateQuantileText(i);
     }
@@ -666,7 +533,6 @@ InsugarTrading.init = function() {
      * these statements should be outside of the MinigameReplacer function above.
      */
     if(!Game.customMinigame['Bank'].tick) Game.customMinigame['Bank'].tick = [];
-    Game.customMinigame['Bank'].tick.push(InsugarTrading.customTickCollectData);
     Game.customMinigame['Bank'].tick.push(InsugarTrading.customTickDisplayData);
 
     if(!Game.customMinigame['Bank'].buyGood) Game.customMinigame['Bank'].buyGood = [];
