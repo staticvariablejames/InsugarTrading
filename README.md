@@ -62,15 +62,17 @@ Statistics
 
 This add-on modifies the interface to add two bits of information to the stock market.
 
-![Goods tooltip](tooltip.png)
+![Goods tooltip](test/visualization.test.ts-snapshots/bankGoodTooltip-firefox-linux.png)
 
 First,
 it modifies the tooltip for the stock market goods
 to display the histogram for that specific good.
 The orange line is the current value of the good.
 The three white lines are the 25%, 50%, and 75% percentiles,
-so, for example, the first quartile for SLT is at $31.81.
+so, for example, the first quartile for SUG is at $13.37.
 The quantiles can be customized in the settings.
+
+![Quantile bar](test/visualization.test.ts-snapshots/bankGoodPanelWithQuantileBar-firefox-linux.png)
 
 Second,
 it adds a bar between the current stock value and the amount that stock owned.
