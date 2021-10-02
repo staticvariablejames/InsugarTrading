@@ -220,8 +220,8 @@ The mod won't check the CCSE version anymore.
 and usually in a backwards-compatible manner.
 Not asking CCSE version every time makes the mod a bit more future-proof.)
 
-Unreleased
-----------
+1.4.0
+-----
 
 Several internal changes, but (hopefully) no externally visible ones.
 
