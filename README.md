@@ -223,7 +223,12 @@ Not asking CCSE version every time makes the mod a bit more future-proof.)
 Unreleased
 ----------
 
-Internal: Removal of tools for generating the dataset in-game.
+Several internal changes, but (hopefully) no externally visible ones.
+
+Ported the mod to TypeScript,
+and added a more robust test suite.
+
+Removal of tools for generating the dataset in-game.
 The existence of [CCCPP](https://github.com/staticvariablejames/CookieClickerCppTools)
 makes them redundant for vanilla Stock market,
 and if it is ever needed for modded content,
