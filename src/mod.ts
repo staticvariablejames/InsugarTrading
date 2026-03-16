@@ -8,8 +8,8 @@ import { getBankLevel, setMinigame } from './util';
 
 export const name = "Insugar Trading";
 export const version = package_json.version; // Semantic versioning
-export const GameVersion = "2.031";
-export const CCSEVersion = "2.026";
+export const GameVersion = "2.058";
+export const CCSEVersion = "2.035";
 export let isLoaded = false;
 
 export function save() {

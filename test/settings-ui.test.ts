@@ -16,12 +16,12 @@ test('Quantiles can be changed', async ({page}) => {
     ).toEqual([0.25, 0.5, 0.75]);
 
     await page.click('text=Options');
-    await page.$eval('text=Quantile25% >> input', e => CConnoisseur.setSliderValue(e, 15));
+    await page.fill('id=InsugarTradingQuantileSlider0', '15');
     expect(
         await page.evaluate('InsugarTrading.settings.quantilesToDisplay')
     ).toEqual([0.15, 0.5, 0.75]);
 
-    await page.$eval('text=Quantile50% >> input', e => CConnoisseur.setSliderValue(e, 5));
+    await page.fill('id=InsugarTradingQuantileSlider1', '5');
     expect(
         await page.evaluate('InsugarTrading.settings.quantilesToDisplay')
     ).toEqual([0.15, 0.05, 0.75]);
@@ -39,7 +39,7 @@ test('Quantiles can be created', async ({page}) => {
         await page.evaluate('InsugarTrading.settings.quantilesToDisplay')
     ).toEqual([0.25, 0.5, 0.75, 0.5, 0.5]);
 
-    await page.$eval(':nth-match(:text("Quantile50%"), 2) >> input', e => CConnoisseur.setSliderValue(e, 95));
+    await page.fill('id=InsugarTradingQuantileSlider3', '95');
     expect(
         await page.evaluate('InsugarTrading.settings.quantilesToDisplay')
     ).toEqual([0.25, 0.5, 0.75, 0.95, 0.5]);

@@ -37,14 +37,13 @@ test.beforeEach(async ({page}) => {
 
     await page.evaluate(() => Game.LoadMod('https://staticvariablejames.github.io/InsugarTrading/InsugarTrading.js'));
     await page.waitForFunction(() => 'Insugar Trading' in Game.mods);
+    await page.waitForFunction('InsugarTrading.data[1] !== undefined');
 });
 
 test('Self-test, dataset is properly overriden', async ({page}) => {
     expect(await page.evaluate('typeof InsugarTrading')).toBe('object');
     expect(await page.evaluate(() => Game.Objects.Bank.level)).toEqual(1);
 
-    await page.evaluate('InsugarTrading.fetchDataset(1)');
-    await page.waitForFunction('InsugarTrading.data[1] !== undefined');
     expect(Array.isArray(await page.evaluate('InsugarTrading.data[1]'))).toBeTruthy();
     expect(await page.evaluate('InsugarTrading.data[1].length')).toBe(16);
     expect(Array.isArray(await page.evaluate('InsugarTrading.data[1][0]'))).toBeTruthy();

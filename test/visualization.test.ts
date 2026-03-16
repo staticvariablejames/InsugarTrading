@@ -30,8 +30,6 @@ test('Creates the quantile row', async ({page}) => {
 });
 
 test('Displays the histogram in the tooltip', async ({page}) => {
-    await page.hover('#bankGood-3');
-
     /* The tooltip hovers above the news ticker,
      * and for some reason (anti-aliasing, perhaps?)
      * the edge of the tooltip includes a few pixels from the news ticker.
@@ -41,6 +39,8 @@ test('Displays the histogram in the tooltip', async ({page}) => {
      */
     await page.evaluate(() => CConnoisseur.clearNewsTickerText());
     await page.evaluate(() => Game.CloseNotes());
+
+    await page.hover('#bankGood-3');
     let tooltipHandle = await page.$('#tooltip');
     expect(await tooltipHandle!.screenshot()).toMatchSnapshot('bankGoodTooltip.png');
 });

@@ -6,8 +6,10 @@
          "path": "./dist/main.js"}
     ],
     "customURLs": [
-        {"url": "https://klattmose.github.io/CookieClicker/CCSE.js"},
-        {"url": "https://klattmose.github.io/CookieClicker/img/CCSEicon.png"}
+        {"url": "https://klattmose.github.io/CookieClicker/CCSE.js",
+         "sha1sum": "14b43ca92caf4db9b3becd50aef6963299d658e1"},
+        {"url": "https://klattmose.github.io/CookieClicker/img/CCSEicon.png",
+         "sha1sum": "41367f116f274c743214f158a7410070b7c92e83"}
     ],
     "localDirectories": [
         {"url": "https://staticvariablejames.github.io/InsugarTrading/data/",
