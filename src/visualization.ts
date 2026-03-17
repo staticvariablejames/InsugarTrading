@@ -23,8 +23,8 @@ type SVGHistogramOptions = {
  *
  * Returns '' if no data is available.
  */
-export function SVGHistogram(bankLevel: number, goodId: number, options: SVGHistogramOptions = {}) {
-    if(!isDataAvailable(bankLevel, goodId)) return '';
+export function SVGHistogram(bankLevel: number, dragonBoost: number, goodId: number, options: SVGHistogramOptions = {}) {
+    if(!isDataAvailable(bankLevel, dragonBoost, goodId)) return '';
 
     if(!options.additionalLines) {
         options.additionalLines = [];
@@ -40,16 +40,18 @@ export function SVGHistogram(bankLevel: number, goodId: number, options: SVGHist
     if(options.forceUpperBound) {
         upperPriceBound = options.forceUpperBound;
     } else {
-        upperPriceBound = data[bankLevel].map(
-                (_, id) => quantile(bankLevel, id, quantileThreshold)!
-            ).reduce(
-                (a, b) => Math.max(a, b)
-            );
+        upperPriceBound = 0;
+        for(let boost in data[bankLevel]) {
+            for(let id in data[bankLevel][boost]) {
+                let bound = quantile(bankLevel, Number(boost), Number(id), quantileThreshold)!;
+                upperPriceBound = Math.max(upperPriceBound, bound);
+            }
+        }
     }
     // This way, every graph has the same scale and nicely fits between 0 and upperPriceBound.
 
-    let entryCount = data[bankLevel][goodId].length;
-    let density = partialSums[bankLevel][goodId][entryCount]/100;
+    let entryCount = data[bankLevel][dragonBoost][goodId].length;
+    let density = partialSums[bankLevel][dragonBoost][goodId][entryCount]/100;
     /* This way, a stock that is uniformly distributed over a range of $10
      * would form a rectangle whose height is the entire range. */
 
@@ -71,16 +73,16 @@ export function SVGHistogram(bankLevel: number, goodId: number, options: SVGHist
     str += `<path d="M ${axesMargin} ${graphHeight} `;
     for(let i = 0; i < 10*upperPriceBound; i++) {
         if(i > 0) str += 'h ' + (graphWidth/10/upperPriceBound) + ' ';
-        let barHeight = rawFrequency(bankLevel, goodId, i)!/density*graphHeight;
+        let barHeight = rawFrequency(bankLevel, dragonBoost, goodId, i)!/density*graphHeight;
         str += 'V ' + (graphHeight - barHeight) + ' ';
     }
     str += ' Z" fill="steelblue" />';
 
     // Draw each additional line
     for(let q of options.additionalLines) {
-        let value = quantile(bankLevel, goodId, q)!;
+        let value = quantile(bankLevel, dragonBoost, goodId, q)!;
         let x = value/upperPriceBound * graphWidth + axesMargin;
-        let frequency = rawFrequency(bankLevel, goodId, Math.floor(10*value))!;
+        let frequency = rawFrequency(bankLevel, dragonBoost, goodId, Math.floor(10*value))!;
         let y = (1 - frequency/density)*graphHeight;
         str += `<line x1="${x}" y1="${y}" x2="${x}" y2="${graphHeight}" stroke="white" />`;
         str += `<text x="${x}" y="${graphHeight+25}" text-anchor="end" transform="rotate(-45 ${x} ${graphHeight+25})" fill="white">$${Math.floor(100*value)/100}</text>`;
@@ -91,7 +93,7 @@ export function SVGHistogram(bankLevel: number, goodId: number, options: SVGHist
      */
     if(options.currentValue) {
         let x = options.currentValue/upperPriceBound * graphWidth + axesMargin;
-        let frequency = rawFrequency(bankLevel, goodId, Math.floor(10*options.currentValue))!;
+        let frequency = rawFrequency(bankLevel, dragonBoost, goodId, Math.floor(10*options.currentValue))!;
         let y = (1 - frequency/density)*graphHeight;
         str += `<line x1="${x}" y1="${y}" x2="${x}" y2="${graphHeight}" stroke="orange" stroke-width="3px"/>`;
     }
@@ -109,7 +111,7 @@ export function SVGHistogram(bankLevel: number, goodId: number, options: SVGHist
 }
 
 // Constructs a large image containing the histograms for all stocks
-export function allSVGHistograms(bankLevel: number, forceUpperBound: number) {
+export function allSVGHistograms(bankLevel: number, dragonBoost: number, forceUpperBound: number) {
     let additionalLines = settings.quantilesToDisplay;
     let displayName = true;
     let innerWidth = 450, innerHeight = 260;
@@ -122,7 +124,7 @@ export function allSVGHistograms(bankLevel: number, forceUpperBound: number) {
         for(let j = 0; j < 4; j++) {
             let goodId = 4*i+j;
             str += `<svg width="${innerWidth}px" height="${innerHeight}px" x="${j*innerWidth}px" y="${i*innerHeight}px">`;
-            str += SVGHistogram(bankLevel, goodId, {displayName, additionalLines, forceUpperBound});
+            str += SVGHistogram(bankLevel, dragonBoost, goodId, {displayName, additionalLines, forceUpperBound});
             str += '</svg>';
         }
     }

@@ -4,7 +4,7 @@
 
 import { inverseQuantile, isDataAvailable } from './dataset';
 import { settings } from './settings';
-import { getBankLevel, getGoodsCount, minigame } from './util';
+import { getBankLevel, getGoodsCount, getDragonBoost, minigame } from './util';
 import { SVGHistogram } from './visualization';
 
 /* Creates a new row in each of the good-displaying boxes, right above the stock count.
@@ -44,8 +44,9 @@ export function interestingness(stockQuantile: number, purchasedPercent: number)
  */
 export function updateQuantileText(id: number) {
     let lvl = getBankLevel();
+    let boost = getDragonBoost();
     let div = document.getElementById('quantile-' + id)!;
-    if(!isDataAvailable(lvl, id)) {
+    if(!isDataAvailable(lvl, boost, id)) {
         div.innerHTML = 'no data';
         div.style.color = '';
         div.style.fontWeight = '';
@@ -53,7 +54,7 @@ export function updateQuantileText(id: number) {
         let good = minigame.goodsById[id];
         let value = good.val;
         let ownPercentage = good.stock / minigame.getGoodMaxStock(good);
-        let q = inverseQuantile(lvl, id, value)!;
+        let q = inverseQuantile(lvl, boost, id, value)!;
         div.innerHTML = (Math.floor(10000*q)/100) + '%';
 
         let intr = interestingness(q, ownPercentage);
@@ -70,10 +71,11 @@ export function updateQuantileText(id: number) {
 export function customGoodTooltip(id: number, str: string) {
     str += '<div class="line"></div>';
     let lvl = getBankLevel();
+    let boost = getDragonBoost();
     let currentValue = minigame.goodsById[id].val;
     let additionalLines = settings.quantilesToDisplay;
-    if(isDataAvailable(lvl, id)) {
-        str += SVGHistogram(lvl, id, {currentValue, additionalLines});
+    if(isDataAvailable(lvl, boost, id)) {
+        str += SVGHistogram(lvl, boost, id, {currentValue, additionalLines});
     } else {
         str += 'InsugarTrading: No data available.';
     }

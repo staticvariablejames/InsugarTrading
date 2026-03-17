@@ -19,3 +19,7 @@ export function getGoodsCount() {
     else
         return 0;
 }
+
+export function getDragonBoost() {
+    return Game.auraMult('Supreme Intellect');
+}

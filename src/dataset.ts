@@ -2,17 +2,19 @@
  */
 
 /* The data here is just a histogram:
- * data[bankLvl][id][value] is the number of times that the id-th stock
+ * data[bankLvl][dragonBoost][id][value] is the number of times that the id-th stock
  * (as listed by Game.Objects['Bank'].goodsById)
  * had its price between value/10 (inclusive) and value/10+1 (exclusive),
- * while the Bank building had the level bankLvl.
+ * while the Bank building had the level bankLvl
+ * and Game.auraMult('Supreme Intellect') was dragonBoost.
  * So this histogram goes in 10-cents increments.
  *
  * The file main.ts makes sure that the array below
  * is globally available as window.InsugarTrading.data;
  * this allows the files data/lvl1.ts through data/lvl50.js to populate it.
  */
-export const data: number[][][] = [];
+export const data: {[dragonBoost: number]: number[][]}[] = [];
+
 
 export function datasetUrl(bankLevel: number) {
     return 'https://staticvariablejames.github.io/InsugarTrading/data/lvl' + bankLevel + '.js';
@@ -34,7 +36,7 @@ export function fetchDataset(bankLevel: number) {
     if(bankLevel <= 0 || bankLevel > highestAvailableDatasetLevel) return;
     if(bankLevel in data) return; // Dataset already fetched
 
-    data[bankLevel] = []; // Simple way of marking that a fetch request was issued
+    data[bankLevel] = {}; // Simple way of marking that a fetch request was issued
 
     // The following code duplicates part of Game.LoadMod,
     // but ensuring to call all functions of onDatasetLoad.
@@ -53,54 +55,56 @@ export function fetchDataset(bankLevel: number) {
  * If data can be downloaded, downloads it but returns false in the meanwhile.
  * Returns false otherwise.
  */
-export function isDataAvailable(bankLevel: number, goodId: number) {
+export function isDataAvailable(bankLevel: number, dragonBoost: number, goodId: number) {
     if(!(bankLevel in data)) {
         fetchDataset(bankLevel);
         return false;
     }
-    return goodId in (data[bankLevel] ?? []);
+    return dragonBoost in (data[bankLevel] ?? []) && goodId in (data[bankLevel][dragonBoost] ?? []);
 }
 
-/* Returns data[bankLevel][goodId][value] if available.
+/* Returns data[bankLevel][dragonBoost][goodId][value] if available.
  * If !isDataAvailable(bankLevel, goodId), returns null.
  * If data is available but the value is out of range, returns 0,
  * which is actually what "frequency" means in this case.
  */
-export function rawFrequency(bankLevel: number, goodId: number, value: number): number | null {
-    if(!isDataAvailable(bankLevel, goodId)) {
+export function rawFrequency(bankLevel: number, dragonBoost: number, goodId: number, value: number): number | null {
+    if(!isDataAvailable(bankLevel, dragonBoost, goodId)) {
         return null;
     }
-    let a = data[bankLevel][goodId];
+    let a = data[bankLevel][dragonBoost][goodId];
     if(value < 0 || value >= a.length) {
         return 0;
     }
     return a[value];
 }
 
-/* partialSums[lvl][id] contains the partial sums of data[lvl][id].
- * More specifically, partialSums[lvl][id][value]
- * is the sum of partialSums[lvl][id][v] for v = 0,...,value-1.
+/* partialSums[lvl][boost][id] contains the partial sums of data[lvl][boost][id].
+ * More specifically, partialSums[lvl][boost][id][value]
+ * is the sum of partialSums[lvl][boost][id][v] for v = 0,...,value-1.
  * So, for example,
- * partialSums[id].length === data[id].length + 1.
+ * partialSums[lvl][boost][id].length === data[lvl][boost][id].length + 1.
  *
  * It is computed by computePartialSums right after the dataset is loaded,
- * so whenever isDataAvailable(lvl, id) is true
+ * so whenever isDataAvailable(lvl, boost, id) is true
  * the partial sums are available.
  */
-export const partialSums: number[][][] = [];
+export const partialSums: {[dragonBoost: number]: number[][]}[] = [];
 
 /* Compute the partial sums for the given bank level,
  * overriding the current partialSums data if any.
  */
 function computePartialSums(lvl: number) {
     partialSums[lvl] = [];
-    for(let id in data[lvl]) {
-        partialSums[lvl][id] = new Array(data[lvl][id].length + 1);
-        partialSums[lvl][id][0] = 0;
-        for(let v = 0; v < data[lvl][id].length; v++) {
-            // This is the only step where we actually need the numerical index
-            partialSums[lvl][id][v+1] = partialSums[lvl][id][v] +
-                    data[lvl][id][v];
+    for(let boost of [0.0, 0.1, 1.0, 1.1]) {
+        partialSums[lvl][boost] = [];
+        for(let id in data[lvl][boost]) {
+            partialSums[lvl][boost][id] = new Array(data[lvl][boost][id].length + 1);
+            partialSums[lvl][boost][id][0] = 0;
+            for(let v = 0; v < data[lvl][boost][id].length; v++) {
+                // This is the only step where we actually need the numerical index
+                partialSums[lvl][boost][id][v+1] = partialSums[lvl][boost][id][v] + data[lvl][boost][id][v];
+            }
         }
     }
 }
@@ -115,14 +119,14 @@ onDatasetLoad.push(computePartialSums);
  *
  * If there is no available data, it returns null.
  */
-export function quantile(bankLevel: number, goodId: number, fraction: number) {
-    if(!isDataAvailable(bankLevel, goodId)) return null;
+export function quantile(bankLevel: number, dragonBoost: number, goodId: number, fraction: number) {
+    if(!isDataAvailable(bankLevel, dragonBoost, goodId)) return null;
 
     if(fraction < 0) return -Infinity;
     if(fraction > 1) return Infinity;
 
     // Binary search, Hermann Bottenbruch version. i is a lower bound, j is an upper bound
-    let a = partialSums[bankLevel][goodId];
+    let a = partialSums[bankLevel][dragonBoost][goodId];
     let i = 0, j = a.length-1;
     let target = fraction * a[j];
     while(i !== j) {
@@ -141,7 +145,7 @@ export function quantile(bankLevel: number, goodId: number, fraction: number) {
     let excess = target - a[i]; // How much we need to take into account for the approximation
     let estimatedQuantile = 0;
     if(excess > 0) {
-        estimatedQuantile += excess/data[bankLevel][goodId][i]/10;
+        estimatedQuantile += excess/data[bankLevel][dragonBoost][goodId][i]/10;
         /* This 'if' prevents a possible division by zero if InsugarTrading.data[goodId][i] === 0
          * It also can never execute if i === InsugarTrading.data[goodId].length,
          * because this would force excess to be 0.
@@ -157,18 +161,18 @@ export function quantile(bankLevel: number, goodId: number, fraction: number) {
  *
  * If there is no available data, it returns null.
  */
-export function inverseQuantile(bankLevel: number, goodId: number, targetValue: number) {
-    if(!isDataAvailable(bankLevel, goodId)) return null;
+export function inverseQuantile(bankLevel: number, dragonBoost: number, goodId: number, targetValue: number) {
+    if(!isDataAvailable(bankLevel, dragonBoost, goodId)) return null;
 
     let value = 10 * targetValue; // The histogram works in increments of 0.1
     if(value <= 0) return 0;
-    if(value >= data[bankLevel][goodId].length) return 1;
+    if(value >= data[bankLevel][dragonBoost][goodId].length) return 1;
 
-    let sum = partialSums[bankLevel][goodId];
+    let sum = partialSums[bankLevel][dragonBoost][goodId];
     let knownToBeSmaller = sum[Math.floor(value)];
     let fraction = value - Math.floor(value);
     // linear approximation inside the bin number Math.floor(value)
-    let estimatedToBeSmaller = fraction * data[bankLevel][goodId][Math.floor(value)];
+    let estimatedToBeSmaller = fraction * data[bankLevel][dragonBoost][goodId][Math.floor(value)];
     return (knownToBeSmaller + estimatedToBeSmaller)/sum[sum.length-1];
 }
 
@@ -176,13 +180,13 @@ export function inverseQuantile(bankLevel: number, goodId: number, targetValue: 
  *
  * A linear approximation is used inside each bin.
  */
-export function averagePrice(bankLevel: number, goodId: number) {
-    if(!isDataAvailable(bankLevel, goodId)) return null;
+export function averagePrice(bankLevel: number, dragonBoost: number, goodId: number) {
+    if(!isDataAvailable(bankLevel, dragonBoost, goodId)) return null;
     let sum = 0;
     let observations = 0;
-    for(let i = 0; i < data[bankLevel][goodId].length; i++) {
-        sum += (i/10+0.05) * data[bankLevel][goodId][i];
-        observations += data[bankLevel][goodId][i];
+    for(let i = 0; i < data[bankLevel][dragonBoost][goodId].length; i++) {
+        sum += (i/10+0.05) * data[bankLevel][dragonBoost][goodId][i];
+        observations += data[bankLevel][dragonBoost][goodId][i];
     }
     return sum/observations;
 }

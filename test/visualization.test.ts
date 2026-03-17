@@ -22,6 +22,7 @@ test.beforeEach(async ({page}) => {
     await page.evaluate(() => Game.LoadMod('https://staticvariablejames.github.io/InsugarTrading/InsugarTrading.js'));
     await page.waitForFunction(() => Game.isMinigameReady(Game.Objects['Bank']));
     await page.waitForFunction(() => 'Insugar Trading' in Game.mods);
+    await page.waitForFunction('0.1 in InsugarTrading.data[1]');
 });
 
 test('Creates the quantile row', async ({page}) => {
