@@ -9,7 +9,7 @@ This is an add-on for [Cookie Clicker](https://orteil.dashnet.org/cookieclicker/
 that helps analyze the Stock Market minigame.
 
 This add-on contains two parts:
-the [dataset](#dataset), which is a histogram of the stock values in the stock market,
+the [dataset](#dataset), which is a histogram of the good values in the stock market,
 collected in a simulation of 1000 years of the market ups and downs;
 and the [statistics display](#statistics),
 which shows the histogram and the quantiles of the current stock values.
@@ -19,23 +19,24 @@ Dataset
 =======
 
 The grand goal of this addon is to display the [statistics](#statistics) described below.
-Lacking a mathematical model,
-I wrote a tool to approximate the probability density function of the stock values
-by simply simulating the stock market for a thousand years.
+Lacking a mathematical model for the probability density function,
+I [wrote a tool](https://github.com/staticvariablejames/CookieClickerCppTools)
+to simulate the stock market for a thousand years.
 (If left unattended, the stock market ticks once every minute,
 so simulating 525960000 ticks corresponds to a thousand years of stock market ups and downs.)
 This produced a histogram,
-which tracks how many times each stock had a given value,
+which tracks how many times each good had a given value,
 with a $0.10 precision.
 
-Since the bank level influences the stock values,
+Since the bank level and Krumblor's auras influences the good values,
 I simulated for bank levels between 1 and 50
-(which I believe to be the most common levels).
-So the dataset actually has 450 histograms,
-one for each bank level and each stock.
-
-See the source code for details on how to collect the data yourself;
-this feature is _not_ available through the user interface.
+(which I believe to be sufficient for the vast majority of players)
+and all four combinations of auras
+(no auras, just "Reality Bending" active,
+just "Supreme Intellect" active,
+and both auras active).
+So the dataset actually has 3600 histograms,
+one for each bank level, aura combination, and good.
 
 Highlights
 ----------
@@ -80,8 +81,8 @@ The quantiles can be customized in the settings.
 ![Quantile bar](test/visualization.test.ts-snapshots/bankGoodPanelWithQuantileBar-firefox-linux.png)
 
 Second,
-it adds a bar between the current stock value and the amount that stock owned.
-It displays the quantile of that stock value,
+it adds a bar between the current good value and the amount that stock owned.
+It displays the quantile of that good value,
 compared to the dataset.
 For example,
 in the picture above,
@@ -89,10 +90,10 @@ SLT is worth $60.71 and its quantile is 62.78%;
 this means that HNY was at or below $60.71 in 62.78% of the time during the simulation.
 
 The color of text ranges from gray to orange:
-it is orange for stocks that you don't currently own and are at a low price (quantile-wise),
-suggesting you might want to buy those stocks,
-and is also orange for stocks you currently own that are at a high price,
-suggesting you might want to sell those stocks.
+it is orange for goods that you don't currently own and are at a low price (quantile-wise),
+suggesting you might want to buy those goods,
+and is also orange for goods you currently own that are at a high price,
+suggesting you might want to sell those goods.
 The color is grayer the less true those statements are.
 
 (These statistics are currently available only if the bank level is at most 50.)
