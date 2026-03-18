@@ -14,7 +14,7 @@ test('The mod loads itself', async ({page}) => {
 test('The mod loads its data', async ({page}) => {
     await page.evaluate('InsugarTrading.fetchDataset(5)');
     await page.waitForFunction('0.1 in InsugarTrading.data[5]');
-    expect(await page.evaluate('InsugarTrading.data[5][0.0].length')).toEqual(16);
+    expect(await page.evaluate('InsugarTrading.data[5][0.0].length')).toEqual(18);
 });
 
 test('Functions in onDatasetLoad are properly called', async ({page}) => {

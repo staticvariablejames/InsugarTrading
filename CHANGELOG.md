@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- Added: datasets for PBL (cortex bakers) and YOU (you).
+- **Breaking change**: The mod was updated to take the influence from Krumblor's auras into account,
+    so many functions' signatures were updated accordingly.
 - Changed: The changelog is now in its own file,
     rather than being part of `README.md`.
 - Changed: The orange bar representing the current value of a good
