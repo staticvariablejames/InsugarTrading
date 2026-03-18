@@ -29,4 +29,18 @@ export default [
             'playwright',
         ],
     },
+    {
+        input: 'src/make-cpp-test.ts',
+        output: {
+            dir: 'bin',
+            format: 'cjs',
+        },
+        plugins: [
+            typescript(),
+        ],
+        external: [
+            'cookie-connoisseur',
+            'playwright',
+        ],
+    },
 ];
