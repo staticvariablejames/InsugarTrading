@@ -1,6 +1,10 @@
 Insugar Trading
 ===============
 
+**[Changelog](CHANGELOG.md)
+| [Highlights](#highlights)
+| [Using the mod](#using-the-mod)**
+
 This is an add-on for [Cookie Clicker](https://orteil.dashnet.org/cookieclicker/)
 that helps analyze the Stock Market minigame.
 
@@ -111,131 +115,6 @@ or create a bookmarklet with the code
 ```javascript
     javascript:(function(){Game.LoadMod('https://staticvariablejames.github.io/InsugarTrading/InsugarTrading.js');}());
 ```
-
-
-Changelog
-=========
-
-1.0.0
------
-
-Initial release.
-
-1.1.0
------
-
-Move the 1.4MB dataset to its own file.
-
-1.1.1
------
-
-Fix a performance bug when collecting data.
-
-1.1.2
------
-
-Add datasets for bank levels up to 30,
-and display the mod's version number in the stats menu.
-
-1.2.0
------
-
-The 4.7M dataset was split in files of around 150K each
-(one for each bank level);
-only the needed datasets are downloaded.
-This should ease the burden on slower connections and speed up loading the mod.
-
-Minor improvements on the histogram display.
-
-1.2.1
------
-
-Fixed bug in which tooltip information would appear twice
-after a wipe save (hard reset).
-
-1.2.2
------
-
-Use CCSE v2.018.
-
-1.2.3
------
-
-Update to Cookie Clicker v2.031.
-The datasets for the new building still need to be computed.
-
-1.2.4
------
-
-Fix a typo in the histogram generation code.
-
-1.2.5
------
-
-Register the mod in the game's modding API.
-
-1.3.0
------
-
-Minor change in graph style.
-
-The graph now has vertical lines displaying specific quantiles.
-
-1.3.1
------
-
-Datasets replaced with datasets computed with
-[Cookie Clicker C++ Tools](https://github.com/staticvariablejames/CookieClickerCppTools).
-This means that bank levels between 1 and 50 are available,
-including Subsidiaries (Idleverses).
-
-Some internal changes.
-
-1.3.2
------
-
-Fixed a typo that ate the orange line in the histogram.
-
-1.3.3
------
-
-Update to CCSE 2.021 and display a notification on load.
-
-1.3.4
------
-
-Update to CCSE 2.023.
-
-1.3.5
------
-
-Update to CCSE 2.025.
-
-1.3.6
------
-
-Update to CCSE 2.026.
-
-The mod won't check the CCSE version anymore.
-(Reasoning: currently CCSE updates far more frequently that Choose Your Own Lump,
-and usually in a backwards-compatible manner.
-Not asking CCSE version every time makes the mod a bit more future-proof.)
-
-1.4.0
------
-
-Several internal changes, but (hopefully) no externally visible ones.
-
-Ported the mod to TypeScript,
-and added a more robust test suite.
-
-Removal of tools for generating the dataset in-game.
-The existence of [CCCPP](https://github.com/staticvariablejames/CookieClickerCppTools)
-makes them redundant for vanilla Stock market,
-and if it is ever needed for modded content,
-it should be rewritten using e.g. [Playwright](https://playwright.dev/)
-or [Cookie Connoisseur](https://github.com/staticvariablejames/cookie-connoisseur).
-
 
 
 Known Bugs/Limitations
