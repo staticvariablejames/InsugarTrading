@@ -51,16 +51,11 @@ export function fetchDataset(bankLevel: number) {
     document.head.appendChild(script);
 }
 
-/* If data is available returns true.
- * If data can be downloaded, downloads it but returns false in the meanwhile.
- * Returns false otherwise.
- */
 export function isDataAvailable(bankLevel: number, dragonBoost: number, goodId: number) {
-    if(!(bankLevel in data)) {
-        fetchDataset(bankLevel);
-        return false;
-    }
-    return dragonBoost in (data[bankLevel] ?? []) && goodId in (data[bankLevel][dragonBoost] ?? []);
+    if(!(bankLevel in data)) return false;
+    if(!(dragonBoost in data[bankLevel])) return false;
+    if(!(goodId in data[bankLevel][dragonBoost])) return false;
+    return true;
 }
 
 /* Returns data[bankLevel][dragonBoost][goodId][value] if available.

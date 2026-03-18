@@ -2,7 +2,7 @@
  * Note that the Options submenu is maintained in settings.ts.
  */
 
-import { inverseQuantile, isDataAvailable } from './dataset';
+import { fetchDataset, inverseQuantile, isDataAvailable } from './dataset';
 import { settings } from './settings';
 import { getBankLevel, getGoodsCount, getDragonBoost, minigame } from './util';
 import { SVGHistogram } from './visualization';
@@ -47,6 +47,7 @@ export function updateQuantileText(id: number) {
     let boost = getDragonBoost();
     let div = document.getElementById('quantile-' + id)!;
     if(!isDataAvailable(lvl, boost, id)) {
+        fetchDataset(lvl);
         div.innerHTML = 'no data';
         div.style.color = '';
         div.style.fontWeight = '';
@@ -77,6 +78,7 @@ export function customGoodTooltip(id: number, str: string) {
     if(isDataAvailable(lvl, boost, id)) {
         str += SVGHistogram(lvl, boost, id, {currentValue, additionalLines});
     } else {
+        fetchDataset(lvl);
         str += 'InsugarTrading: No data available.';
     }
     return str;

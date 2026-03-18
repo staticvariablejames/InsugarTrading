@@ -37,7 +37,7 @@ test.beforeEach(async ({page}) => {
 
     await page.evaluate(() => Game.LoadMod('https://staticvariablejames.github.io/InsugarTrading/InsugarTrading.js'));
     await page.waitForFunction(() => 'Insugar Trading' in Game.mods);
-    await page.waitForFunction('InsugarTrading.data[1] !== undefined');
+    await page.waitForFunction(() => window.InsugarTrading.isDataAvailable(1, 0.1, 0));
 });
 
 test('Self-test, dataset is properly overriden', async ({page}) => {
