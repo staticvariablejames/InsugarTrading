@@ -3,35 +3,36 @@
 import { chromium } from 'playwright';
 import { openCookieClickerPage } from 'cookie-connoisseur';
 
-const bankLevel = 1;
-
-setTimeout(async () => {
+async function makeSummary(bankLevel: number, aura1: number, aura2: number) {
     let browser = await chromium.launch();
     let page = await openCookieClickerPage(browser, {
         saveGame: {
+            dragonAura: aura1,
+            dragonAura2: aura2,
             buildings: {
                 Bank: {
                     amount: 1,
-                    level: 1,
+                    level: bankLevel,
                 },
             },
         }
     });
-    let boost = 0.0;
     await page.evaluate(() => Game.LoadMod('https://staticvariablejames.github.io/InsugarTrading/InsugarTrading.js'));
     await page.waitForFunction(() => 'Insugar Trading' in Game.mods);
 
     console.log('| Good | Average | Min | 1st quartile | Median | 3rd quartile | Max |');
     console.log('|------|---------|-----|--------------|--------|--------------|-----|');
     let goodsCount = await page.evaluate(() => Game.Objects['Bank'].minigame.goodsById.length);
-    await page.waitForFunction(lvl => window.InsugarTrading.isDataAvailable(lvl, boost, 0), bankLevel);
+    await page.waitForFunction(lvl => window.InsugarTrading.isDataAvailable(lvl, Game.auraMult('Supreme Intellect'), 0), bankLevel);
     for(let i = 0; i < goodsCount; i++) {
-        console.log(await page.evaluate(({i, bankLevel, boost}) => {
+        console.log(await page.evaluate(({i}) => {
+            let boost = Game.auraMult('Supreme Intellect');
+            let bankLevel = Game.Objects['Bank'].level;
             let min = 0;
             while(window.InsugarTrading.data[bankLevel][boost][i][min] <= 0) {
                 min++;
             }
-            let max = window.InsugarTrading.data[bankLevel][i].length + 1;
+            let max = window.InsugarTrading.data[bankLevel][boost][i].length + 1;
             return '| ' + Game.Objects['Bank'].minigame.goodsById[i].symbol + ' | ' +
                 Math.floor(window.InsugarTrading.averagePrice(bankLevel, boost, i)! * 100)/100 + ' | ' +
                 min/10 + ' | ' +
@@ -39,9 +40,16 @@ setTimeout(async () => {
                 Math.floor(window.InsugarTrading.quantile(bankLevel, boost, i, 0.50)! * 100)/100 + ' | ' +
                 Math.floor(window.InsugarTrading.quantile(bankLevel, boost, i, 0.75)! * 100)/100 + ' | ' +
                 max/10 + ' | ';
-        }, {i, bankLevel, boost}));
+        }, {i}));
     }
 
     await page.close();
     await browser.close();
+};
+
+// No top-level await on cjs, so we setTimeout
+setTimeout(async () => {
+    await makeSummary(1, 0, 0);
+    console.log();
+    await makeSummary(1, 18, 20);
 });
