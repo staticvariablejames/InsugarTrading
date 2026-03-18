@@ -3,7 +3,7 @@
 import { fetchDataset, onDatasetLoad } from './dataset';
 import * as package_json from '../package.json'
 import { customOptionsMenu, settings } from './settings';
-import { createQuantileRows, customGoodTooltip, customTickDisplayData, updateQuantileText } from './ui';
+import { createQuantileRows, customGoodTooltip, updateAllQuantileTexts, updateQuantileText } from './ui';
 import { getBankLevel, setMinigame } from './util';
 
 export const name = "Insugar Trading";
@@ -28,12 +28,12 @@ export function load(str: string) {
     /* In every load,
      * stockMarket.js first creates a brand new stock market and simulates 15 ticks of it
      * before overriding the data with what was in the save game.
-     * So we must make sure that InsugarTrading.customTickDisplayData is called after the override.
+     * So we must make sure that InsugarTrading.updateAllQuantileTexts is called after the override.
      *
      * Hooks installed by InsugarTrading.init take care of calling this function
      * if the minigame hasn't loaded yet when InsugarTrading.load() is called.
      */
-    customTickDisplayData();
+    updateAllQuantileTexts();
 }
 
 export function init() {
@@ -42,7 +42,7 @@ export function init() {
         setMinigame();
         createQuantileRows();
 
-        onDatasetLoad.push(customTickDisplayData);
+        onDatasetLoad.push(updateAllQuantileTexts);
         fetchDataset(getBankLevel());
     },'Bank');
 
@@ -58,7 +58,7 @@ export function init() {
      * these statements should be outside of the MinigameReplacer function above.
      */
     if(!Game.customMinigame['Bank'].tick) Game.customMinigame['Bank'].tick = [];
-    Game.customMinigame['Bank'].tick.push(customTickDisplayData);
+    Game.customMinigame['Bank'].tick.push(updateAllQuantileTexts);
 
     if(!Game.customMinigame['Bank'].buyGood) Game.customMinigame['Bank'].buyGood = [];
     Game.customMinigame['Bank'].buyGood.push(updateQuantileText);

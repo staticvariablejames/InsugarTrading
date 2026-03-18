@@ -9,6 +9,7 @@ export { data, quantile, inverseQuantile, averagePrice, onDatasetLoad, isDataAva
 
 // Mostly testing
 export { partialSums, fetchDataset } from './dataset';
+export { updateAllQuantileTexts } from './ui';
 
 // Needed for the UI
 export { eraseQuantileSlider, quantileSliderCallback } from './settings';

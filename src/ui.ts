@@ -82,7 +82,10 @@ export function customGoodTooltip(id: number, str: string) {
     return str;
 }
 
-export function customTickDisplayData() {
+/* Calls updateQuantileText for all goods.
+ * This will be run when the minigame is loaded or ticks.
+ */
+export function updateAllQuantileTexts() {
     // We're relying on getGoodsCount() == 0 if the minigame hasn't loaded
     for(let i = 0; i < getGoodsCount(); i++) {
         updateQuantileText(i);
