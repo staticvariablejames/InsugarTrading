@@ -19,7 +19,8 @@ type SVGHistogramOptions = {
  *  each number is considered a quantile and one vertical line is generated for each.
  * If displayName is true, the name of the stock is displayed in the top right corner.
  * If forceUpperBound is present, the histogram price axis will range from 0 to forceUpperBound;
- *  otherwise, the upper bound will be the highest 99.999% of all goods.
+ *  otherwise, the upper bound will be the highest 99.9th percentile of all goods.
+ *  This simplifies visually comparing two goods under the same bank level and dragon boost.
  *
  * Returns '' if no data is available.
  */
@@ -35,17 +36,15 @@ export function SVGHistogram(bankLevel: number, dragonBoost: number, goodId: num
     let str = `<svg width="${graphWidth+2*axesMargin}px" height="${graphHeight + bottomMargin}px">`;
     // We ignore the top margin
 
-    let quantileThreshold = 0.99999;
+    let quantileThreshold = 0.999;
     let upperPriceBound;
     if(options.forceUpperBound) {
         upperPriceBound = options.forceUpperBound;
     } else {
         upperPriceBound = 0;
-        for(let boost in data[bankLevel]) {
-            for(let id in data[bankLevel][boost]) {
-                let bound = quantile(bankLevel, Number(boost), Number(id), quantileThreshold)!;
-                upperPriceBound = Math.max(upperPriceBound, bound);
-            }
+        for(let id in data[bankLevel][dragonBoost]) {
+            let bound = quantile(bankLevel, dragonBoost, Number(id), quantileThreshold)!;
+            upperPriceBound = Math.max(upperPriceBound, bound);
         }
     }
     // This way, every graph has the same scale and nicely fits between 0 and upperPriceBound.
@@ -93,8 +92,9 @@ export function SVGHistogram(bankLevel: number, dragonBoost: number, goodId: num
      */
     if(options.currentValue) {
         let x = options.currentValue/upperPriceBound * graphWidth + axesMargin;
-        let frequency = rawFrequency(bankLevel, dragonBoost, goodId, Math.floor(10*options.currentValue))!;
-        let y = (1 - frequency/density)*graphHeight;
+        let rawFreq = rawFrequency(bankLevel, dragonBoost, goodId, Math.floor(10*options.currentValue))!;
+        let frequency = Math.max(0.05, rawFreq/density); // Ensures currentValue's height is at least 5% of the graph
+        let y = (1 - frequency)*graphHeight;
         str += `<line x1="${x}" y1="${y}" x2="${x}" y2="${graphHeight}" stroke="orange" stroke-width="3px"/>`;
     }
 

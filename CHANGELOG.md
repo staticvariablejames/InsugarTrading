@@ -1,8 +1,10 @@
 # Changelog
 
 ## Unreleased
-- Changed: the changelog is now in its own file,
+- Changed: The changelog is now in its own file,
     rather than being part of `README.md`.
+- Changed: The orange bar representing the current value of a good
+    now has a minimum height.
 
 ## 1.4.0 - 2021-10-01
 - Changed: Several internal changes, but (hopefully) no externally visible ones.
