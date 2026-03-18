@@ -5,7 +5,7 @@ export { name, version, GameVersion, CCSEVersion, init, load, save, isLoaded } f
 
 // API
 export { settings } from './settings';
-export { data, quantile, inverseQuantile, averagePrice, onDatasetLoad, isDataAvailable } from './dataset';
+export { data, quantile, inverseQuantile, averagePrice, onDatasetLoad, isDataAvailable, makeTestingTriangularDistribution } from './dataset';
 
 // Mostly testing
 export { partialSums, fetchDataset } from './dataset';

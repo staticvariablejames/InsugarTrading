@@ -15,7 +15,6 @@
  */
 export const data: {[dragonBoost: number]: number[][]}[] = [];
 
-
 export function datasetUrl(bankLevel: number) {
     return 'https://staticvariablejames.github.io/InsugarTrading/data/lvl' + bankLevel + '.js';
 }
@@ -49,6 +48,33 @@ export function fetchDataset(bankLevel: number) {
         }
     }
     document.head.appendChild(script);
+}
+
+/* Generates a dataset with triangular distribution between $0+id and $100+id, and median $50+id.
+ * This is used for testing.
+ */
+export function makeTestingTriangularDistribution() {
+    const highestId = 17;
+    for(let lvl = 1; lvl <= highestAvailableDatasetLevel; lvl++) {
+        data[lvl] = {0.0: [], 0.1: [], 1.0: [], 1.1: []};
+        for(let boost in data[lvl]) {
+            for(let id = 0; id <= highestId; id++) {
+                data[lvl][boost][id] = Array(1000+10*id);
+                for(let i = 0; i < 10*id; i++) {
+                    data[lvl][boost][id][i] = 0;
+                }
+                for(let i = 0; i < 500; i++) {
+                    data[lvl][boost][id][i + 10*id] = 2*i+1;
+                }
+                for(let i = 0; i < 500; i++) {
+                    data[lvl][boost][id][i+500 + 10*id] = 1000-(2*i+1);
+                }
+            }
+        }
+        for(let f of onDatasetLoad) {
+            f(lvl);
+        }
+    }
 }
 
 export function isDataAvailable(bankLevel: number, dragonBoost: number, goodId: number) {

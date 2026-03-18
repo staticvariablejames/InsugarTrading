@@ -116,3 +116,16 @@ test('Average prices are properly calculated', async ({page}) => {
     expect(await page.evaluate('InsugarTrading.averagePrice(1, 0.1, 1)')).toBeCloseTo(0.6, 10);
     expect(await page.evaluate('InsugarTrading.averagePrice(1, 0.1, 2)')).toBeCloseTo(0.7, 10);
 });
+
+test('The triangular distribution dataset is properly created', async ({page}) => {
+    await page.evaluate(() => window.InsugarTrading.makeTestingTriangularDistribution());
+    expect(await page.evaluate('InsugarTrading.averagePrice(1, 0, 0)')).toBeCloseTo(50, 10);
+    expect(await page.evaluate('InsugarTrading.averagePrice(1, 0, 1)')).toBeCloseTo(51, 10);
+    expect(await page.evaluate('InsugarTrading.averagePrice(1, 0, 2)')).toBeCloseTo(52, 10);
+    expect(await page.evaluate('InsugarTrading.quantile(1, 0, 0, 1/2)')).toBeCloseTo(50, 10);
+    expect(await page.evaluate('InsugarTrading.quantile(1, 0, 1, 1/2)')).toBeCloseTo(51, 10);
+    expect(await page.evaluate('InsugarTrading.quantile(1, 0, 0, 7/8)')).toBeCloseTo(75, 10);
+    expect(await page.evaluate('InsugarTrading.quantile(1, 0, 0, 1/8)')).toBeCloseTo(25, 10);
+    expect(await page.evaluate('InsugarTrading.inverseQuantile(1, 0, 0, 95)')).toBeCloseTo(199/200, 10);
+    expect(await page.evaluate('InsugarTrading.inverseQuantile(1, 0, 0, 5)')).toBeCloseTo(1/200, 10);
+});
