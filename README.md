@@ -102,18 +102,18 @@ Using the mod
 =============
 
 The best solution is adding
-<https://staticvariablejames.github.io/InsugarTrading/InsugarTrading.js>
+<https://staticvariablejames.github.io/InsugarTrading/dist/main.js>
 to [Cookie Clicker Mod Manager](https://github.com/klattmose/CookieClickerModManager).
 
 Alternatively,
 run
 ```javascript
-    Game.LoadMod('https://staticvariablejames.github.io/InsugarTrading/InsugarTrading.js');
+    Game.LoadMod('https://staticvariablejames.github.io/InsugarTrading/dist/main.js');
 ```
 on your browser Javascript console,
 or create a bookmarklet with the code
 ```javascript
-    javascript:(function(){Game.LoadMod('https://staticvariablejames.github.io/InsugarTrading/InsugarTrading.js');}());
+    javascript:Game.LoadMod('https://staticvariablejames.github.io/InsugarTrading/dist/main.js');
 ```
 
 
