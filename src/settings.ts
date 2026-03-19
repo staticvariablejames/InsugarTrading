@@ -3,14 +3,25 @@
  */
 
 export let settings = { // default settings
+    attentionThreshold: 0.75,
     quantilesToDisplay: [0.25, 0.5, 0.75],
 };
+
+/* Every function here is ran whenever the settings change.
+ * This is here primarily to prevent a circular dependency between settings.ts and ui.ts.
+ */
+export let onSettingsChange: (() => void)[] = [];
+function callAllSettingsUpdateCallback() {
+    for(let callback of onSettingsChange)
+        callback();
+}
 
 export function quantileSliderCallback(i: number) {
     let slider = document.getElementById('InsugarTradingQuantileSlider' + i) as HTMLInputElement;
     let value = slider?.value ?? 50;
     settings.quantilesToDisplay[i] = Number(value)/100;
     document.getElementById(`InsugarTradingQuantileSlider${i}RightText`)!.innerHTML = value + '%';
+    callAllSettingsUpdateCallback();
 }
 
 // Makes a slider for index i of InsugarTrading.settings.quantilesToDisplay
@@ -27,10 +38,27 @@ export function makeQuantileSlider(i: number) {
 export function eraseQuantileSlider(i: number) {
     settings.quantilesToDisplay.splice(i, 1);
     Game.UpdateMenu();
+    callAllSettingsUpdateCallback();
+}
+
+export function attentionThresholdSliderCallback() {
+    let slider = document.getElementById('InsugarTradingAttentionThresholdSlider') as HTMLInputElement;
+    let value = slider?.value ?? 50;
+    settings.attentionThreshold = Number(value)/100;
+    document.getElementById(`InsugarTradingAttentionThresholdSliderRightText`)!.innerHTML = value + '%';
+    callAllSettingsUpdateCallback();
 }
 
 export function customOptionsMenu() {
     let menuStr = "";
+    menuStr += '<div class="listing">' + Game.WriteSlider(
+        'InsugarTradingAttentionThresholdSlider',
+        'Attention Threshold',
+        '[$]%',
+        () => Math.round(settings.attentionThreshold*100),
+        'InsugarTrading.attentionThresholdSliderCallback()'
+    ) + '</div>';
+
     for(let i = 0; i < settings.quantilesToDisplay.length; i++) {
         menuStr += '<div class="listing">' +
             makeQuantileSlider(i) +

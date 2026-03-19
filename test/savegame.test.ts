@@ -13,6 +13,7 @@ test('Settings are saved', async ({page}) => {
     expect(save.modSaveData['Insugar Trading']).toEqual({
         version: version,
         settings: {
+            attentionThreshold: 0.75,
             quantilesToDisplay: [0.25, 0.5, 0.75],
         },
     });
@@ -24,6 +25,7 @@ test.describe('Settings are parsed', () => {
             'Insugar Trading': {
                 version: version,
                 settings: {
+                    attentionThreshold: 0.25,
                     quantilesToDisplay: [0.15, 0.5, 0.75],
                 },
             },
@@ -37,6 +39,8 @@ test.describe('Settings are parsed', () => {
 
         let quantiles = await page.evaluate('InsugarTrading.settings.quantilesToDisplay');
         expect(quantiles).toEqual([0.15, 0.5, 0.75]);
+        let attention = await page.evaluate('InsugarTrading.settings.attentionThreshold');
+        expect(attention).toEqual(0.25);
     });
 
     test('after loading the game', async ({page}) => {
@@ -48,5 +52,7 @@ test.describe('Settings are parsed', () => {
 
         let quantiles = await page.evaluate('InsugarTrading.settings.quantilesToDisplay');
         expect(quantiles).toEqual([0.15, 0.5, 0.75]);
+        let attention = await page.evaluate('InsugarTrading.settings.attentionThreshold');
+        expect(attention).toEqual(0.25);
     });
 });

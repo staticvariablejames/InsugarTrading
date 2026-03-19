@@ -24,6 +24,9 @@ export function load(str: string) {
     if('quantilesToDisplay' in obj.settings ?? {}) {
         settings.quantilesToDisplay = obj.settings.quantilesToDisplay;
     }
+    if('attentionThreshold' in obj.settings ?? {}) {
+        settings.attentionThreshold = obj.settings.attentionThreshold;
+    }
 
     /* In every load,
      * stockMarket.js first creates a brand new stock market and simulates 15 ticks of it

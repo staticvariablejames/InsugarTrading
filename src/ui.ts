@@ -3,7 +3,7 @@
  */
 
 import { fetchDataset, inverseQuantile, isDataAvailable } from './dataset';
-import { settings } from './settings';
+import { settings, onSettingsChange } from './settings';
 import { getBankLevel, getGoodsCount, getDragonBoost, minigame } from './util';
 import { SVGHistogram } from './visualization';
 
@@ -29,14 +29,39 @@ export function createQuantileRows() {
     }
 }
 
-/* An estimator for the interestingness of the given stock
- * (i.e. how much attention should be paid to that stock).
- * 0 is not interesting at all; happens if you have none of that expensive stock,
- *  or all of that cheap stock.
- * 1 is very interesting, and happens if either you have none and the stock is very cheap,
- *  or if you have a lot of that stock and is very expensive. */
-export function interestingness(stockQuantile: number, purchasedPercent: number) {
-    return purchasedPercent * stockQuantile + (1-purchasedPercent) * (1 - stockQuantile);
+/* An estimator for how much attention should be paid to a good with the given quantile,
+ * respecting settings.attentionThreshold.
+ * 0 is not interesting at all; happens if you have none of that expensive good,
+ *  or all of that cheap good.
+ * 1 is very interesting, and happens if either you have none and the good is very cheap,
+ *  or if you have a lot of that good and is very expensive.
+ *
+ * For intermediate values, if canSell,
+ * this function returns 0 if stockQuantile is below settings.attentionThreshold,
+ * and interpolates linearly between settings.attentionThreshold and 1.
+ * The opposite happens if canBuy.
+ * If both canBuy and canSell we return the maximum of the two directions.
+ */
+export function attentionForQuantile(stockQuantile: number, canBuy: boolean, canSell: boolean) {
+    let t = settings.attentionThreshold;
+    let attentionIfSelling = (stockQuantile - t)/(1-t);
+    if(!(attentionIfSelling > 0)) attentionIfSelling = 0; // weird conditional also handles NaN
+    if(!canSell) attentionIfSelling = 0;
+    let attentionIfBuying = (1-t - stockQuantile)/(1-t);
+    if(!(attentionIfBuying > 0)) attentionIfBuying = 0;
+    if(!canBuy) attentionIfBuying = 0;
+    return Math.max(attentionIfBuying, attentionIfSelling);
+}
+
+/* Returns the attentionForQuantile of the given stock.
+ */
+export function attentionForStock(stockId: number) {
+    let good = minigame.goodsById[stockId];
+    let value = good.val;
+    let canBuy = good.stock < minigame.getGoodMaxStock(good);
+    let canSell = good.stock > 0;
+    let quantile = inverseQuantile(getBankLevel(), getDragonBoost(), stockId, value)!;
+    return attentionForQuantile(quantile, canBuy, canSell);
 }
 
 /* Updates the text inside the row created by createQuantileRows.
@@ -54,18 +79,18 @@ export function updateQuantileText(id: number) {
     } else {
         let good = minigame.goodsById[id];
         let value = good.val;
-        let ownPercentage = good.stock / minigame.getGoodMaxStock(good);
         let q = inverseQuantile(lvl, boost, id, value)!;
         div.innerHTML = (Math.floor(10000*q)/100) + '%';
 
-        let intr = interestingness(q, ownPercentage);
-        div.style.fontWeight = (intr > 0.5 ? 'bold' : '');
+        let att = attentionForStock(id);
+        div.style.fontWeight = (att >= 0.5 ? 'bold' : '');
 
-        // Makeshift color interpolation from gray to orange
+        // Makeshift color interpolation from grey (which is div.parentElement.style.color) to orange
+        att = Math.min(1, att/0.9); // Make it attain max oranginess at 0.9 attention
         div.style.color = 'rgba(255, ' + // red
-                (165+(1-intr)*90) + ', ' + // green
-                ((1-intr)*255) + ', ' + // blue
-                (0.7 + 0.3*intr) + ')'; // alpha
+                (165+(1-att)*90) + ', ' + // green
+                ((1-att)*255) + ', ' + // blue
+                (0.7 + 0.3*att) + ')'; // alpha
     }
 }
 
@@ -93,3 +118,4 @@ export function updateAllQuantileTexts() {
         updateQuantileText(i);
     }
 }
+onSettingsChange.push(updateAllQuantileTexts);
