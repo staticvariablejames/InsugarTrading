@@ -6,6 +6,8 @@
     so many functions' signatures were updated accordingly.
 - **Breaking change**: `InsugarTrading.isDataAvailable` no longer fetches a dataset
     if data is unavailable.
+- Changed: The threshold for when a good is highlighted is now higher
+    and can be adjusted in the settings.
 - Changed: The changelog is now in its own file,
     rather than being part of `README.md`.
 - Changed: The orange bar representing the current value of a good

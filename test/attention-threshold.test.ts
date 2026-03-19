@@ -12,8 +12,13 @@ test.beforeEach(async ({page}) => {
                 amount: 10, // Max stock = 20
                 minigame: {
                     goods: {
+                        /* Under TriangularDistribution,
+                         * value = 50+id is 50% quantile (median),
+                         * value = 75+id is 87.5% quantile (highest octile),
+                         * value = 25+id is 12.5% quantile (lowest octile).
+                         */
                         'CRL': {val: 50+0, stock: 20}, // maxed-out stock
-                        'CHC': {val: 75+1, stock: 20}, // val == 75+id, due to TriangularDistribution
+                        'CHC': {val: 75+1, stock: 20},
                         'BTR': {val: 25+2, stock: 20},
                         'SUG': {val: 50+3, stock: 0}, // empty stock
                         'NUT': {val: 75+4, stock: 0},
@@ -63,4 +68,49 @@ test('Attention estimates are correct', async ({page}) => {
     expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(6))).toBeCloseTo(0, 10);
     expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(7))).toBeCloseTo(0.75, 10);
     expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(8))).toBeCloseTo(0.75, 10);
+
+    // Test after raising the threshold value
+    await page.evaluate(() => window.InsugarTrading.settings.attentionThreshold = 0.75);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(0))).toBeCloseTo(0, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(1))).toBeCloseTo(0.5, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(2))).toBeCloseTo(0, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(3))).toBeCloseTo(0, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(4))).toBeCloseTo(0, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(5))).toBeCloseTo(0.5, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(6))).toBeCloseTo(0, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(7))).toBeCloseTo(0.5, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(8))).toBeCloseTo(0.5, 10);
+
+    // Test after lowering the threshold value
+    await page.evaluate(() => window.InsugarTrading.settings.attentionThreshold = 0);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(0))).toBeCloseTo(0.5, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(1))).toBeCloseTo(0.875, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(2))).toBeCloseTo(0.125, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(3))).toBeCloseTo(0.5, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(4))).toBeCloseTo(0.125, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(5))).toBeCloseTo(0.875, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(6))).toBeCloseTo(0.5, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(7))).toBeCloseTo(0.875, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(8))).toBeCloseTo(0.875, 10);
+});
+
+test('Attention estimates update graphically', async ({page}) => {
+    let quantileDisplayLocator = await page.locator('id=quantile-1');
+    await expect(quantileDisplayLocator).toHaveCSS('font-weight', '700'); // 700 is bold
+
+    async function setThreshold(str: string) {
+        await page.click('text=Options');
+        await page.fill('id=InsugarTradingAttentionThresholdSlider', str);
+        await page.click('text=Options');
+    }
+    await setThreshold('75');
+
+    // Check setter works
+    expect(await page.evaluate(() => window.InsugarTrading.settings.attentionThreshold)).toBe(0.75);
+
+    // Check font-weight is still bold
+    await expect(quantileDisplayLocator).toHaveCSS('font-weight', '700');
+
+    await setThreshold('76');
+    await expect(quantileDisplayLocator).toHaveCSS('font-weight', '400'); // 400 is normal
 });

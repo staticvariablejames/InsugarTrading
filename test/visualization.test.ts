@@ -13,9 +13,14 @@ test.beforeEach(async ({page}) => {
                             val: 21.72,
                             d: -0.75,
                         },
+                        'NUT': {
+                            val: 4.15,
+                            d: 0.02,
+                        },
                     },
                 },
             },
+            "Temple": {amount: 678},
         },
     }});
 
@@ -26,8 +31,15 @@ test.beforeEach(async ({page}) => {
 });
 
 test('Creates the quantile row', async ({page}) => {
+    await page.evaluate(() => Game.Objects.Bank.minigame.secondsPerTick = 56879);
+    await page.pause();
     let bankGoodPanel = await page.$('#bankGood-3');
     expect(await bankGoodPanel!.screenshot()).toMatchSnapshot('bankGoodPanelWithQuantileBar.png');
+});
+
+test('Highlights goods away from the median', async ({page}) => {
+    let bankGoodPanel = await page.$('#bankGood-4');
+    expect(await bankGoodPanel!.screenshot()).toMatchSnapshot('bankGoodPanelWithHighlightedQuantileBar.png');
 });
 
 test('Displays the histogram in the tooltip', async ({page}) => {

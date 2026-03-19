@@ -114,17 +114,23 @@ It displays the quantile of that good value,
 compared to the dataset.
 For example,
 in the picture above,
-SLT is worth $60.71 and its quantile is 62.78%;
-this means that HNY was at or below $60.71 in 62.78% of the time during the simulation.
+SUG is worth $21.72 and its quantile is 34.22%;
+this means that SUG was at or below $21.72 in 34.22% of the time during the simulation.
 
-The color of text ranges from gray to orange:
-it is orange for goods that you don't currently own and are at a low price (quantile-wise),
-suggesting you might want to buy those goods,
-and is also orange for goods you currently own that are at a high price,
-suggesting you might want to sell those goods.
-The color is grayer the less true those statements are.
+![Highlighted quantile bar](test/visualization.test.ts-snapshots/bankGoodPanelWithHighlightedQuantileBar-firefox-linux.png)
 
-(These statistics are currently available only if the bank level is at most 50.)
+For goods you own which are in high quantiles
+(which you might want to sell)
+and goods you own which are in low quantiles
+(which you might want to buy)
+the color inside the bar will be colored orange,
+in a spectrum
+(further away from the median means more orange).
+The threshold at which the good starts being highlighted can be changed in the settings.
+By default,
+it only highlights goods whose value are at or above their 75% quantile
+(or, correspondingly, for goods you own,
+at or below their 25% quantile).
 
 
 Using the mod
