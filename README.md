@@ -158,9 +158,11 @@ Known Bugs/Limitations
 Only datasets for banks up to level 50 are available
 (although I believe this should be enough for most players).
 
-Currently, the displayed quantiles are not updated if the bank is leveled up.
-This issue fixes itself with the next tick,
-but the mod displays slightly wrong information before it comes.
+Currently,
+the displayed quantiles are not immediately updated if the bank is leveled up,
+or if the dragon auras are changed.
+The quantiles are updated in the next market tick,
+but the mod displays slightly incorrect information in the meanwhile.
 
 
 License
