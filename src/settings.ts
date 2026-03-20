@@ -4,6 +4,7 @@
 
 export let settings = { // default settings
     attentionThreshold: 0.75,
+    autohideUninterestingGoods: false,
     quantilesToDisplay: [0.25, 0.5, 0.75],
 };
 
@@ -14,6 +15,23 @@ export let onSettingsChange: (() => void)[] = [];
 function callAllSettingsUpdateCallback() {
     for(let callback of onSettingsChange)
         callback();
+}
+
+// While we wait for https://github.com/microsoft/TypeScript/issues/48992
+export type booleanKey = {[key in keyof typeof settings]: typeof settings[key] extends boolean ? key : never}[keyof typeof settings & string];
+
+export function toggleSettingCallback(key: booleanKey, description: string) {
+    settings[key] = !settings[key];
+    let element = document.getElementById('InsugarTrading'+key+'Button')!;
+    if(settings[key]) {
+        element.classList.remove("off");
+        element.innerHTML = description + ' ON';
+    } else {
+        element.classList.add("off");
+        element.innerHTML = description + ' OFF';;
+    }
+    PlaySound('snd/tick.mp3');
+    callAllSettingsUpdateCallback();
 }
 
 export function quantileSliderCallback(i: number) {
@@ -58,6 +76,16 @@ export function customOptionsMenu() {
         () => Math.round(settings.attentionThreshold*100),
         'InsugarTrading.attentionThresholdSliderCallback()'
     ) + '</div>';
+
+    // TODO: create a makeButton function or something, especially if we need more buttons
+    let onoff = settings.autohideUninterestingGoods;
+    menuStr += `<div class="listing"><a id="InsugarTradingautohideUninterestingGoodsButton"
+        class="smallFancyButton prefButton option${onoff? "" : " off"}"
+        onclick="InsugarTrading.toggleSettingCallback('autohideUninterestingGoods', 'Autohide goods')">
+            Autohide goods ${onoff? 'ON': 'OFF'}
+        </a>
+        <label>On each tick, automatically hide stocks below the attention threshold</label>
+        </div>`;
 
     for(let i = 0; i < settings.quantilesToDisplay.length; i++) {
         menuStr += '<div class="listing">' +

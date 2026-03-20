@@ -3,7 +3,7 @@
 import { fetchDataset, onDatasetLoad } from './dataset';
 import * as package_json from '../package.json'
 import { customOptionsMenu, settings } from './settings';
-import { createQuantileRows, customGoodTooltip, updateAllQuantileTexts, updateQuantileText } from './ui';
+import { createQuantileRows, customGoodTooltip, updateAllQuantileTexts, updateQuantileText, toggleVisibilityInterestingGoods } from './ui';
 import { getBankLevel, setMinigame } from './util';
 
 export const name = "Insugar Trading";
@@ -21,12 +21,7 @@ export function save() {
 
 export function load(str: string) {
     let obj = JSON.parse(str);
-    if('quantilesToDisplay' in obj.settings ?? {}) {
-        settings.quantilesToDisplay = obj.settings.quantilesToDisplay;
-    }
-    if('attentionThreshold' in obj.settings ?? {}) {
-        settings.attentionThreshold = obj.settings.attentionThreshold;
-    }
+    Object.assign(settings, obj.settings);
 
     /* In every load,
      * stockMarket.js first creates a brand new stock market and simulates 15 ticks of it
@@ -37,6 +32,7 @@ export function load(str: string) {
      * if the minigame hasn't loaded yet when InsugarTrading.load() is called.
      */
     updateAllQuantileTexts();
+    toggleVisibilityInterestingGoods();
 }
 
 export function init() {
@@ -46,6 +42,7 @@ export function init() {
         createQuantileRows();
 
         onDatasetLoad.push(updateAllQuantileTexts);
+        onDatasetLoad.push(toggleVisibilityInterestingGoods);
         fetchDataset(getBankLevel());
     },'Bank');
 
@@ -62,6 +59,7 @@ export function init() {
      */
     if(!Game.customMinigame['Bank'].tick) Game.customMinigame['Bank'].tick = [];
     Game.customMinigame['Bank'].tick.push(updateAllQuantileTexts);
+    Game.customMinigame['Bank'].tick.push(toggleVisibilityInterestingGoods);
 
     if(!Game.customMinigame['Bank'].buyGood) Game.customMinigame['Bank'].buyGood = [];
     Game.customMinigame['Bank'].buyGood.push(updateQuantileText);

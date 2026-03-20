@@ -12,4 +12,4 @@ export { partialSums, fetchDataset } from './dataset';
 export { updateAllQuantileTexts, attentionForQuantile, attentionForStock } from './ui';
 
 // Needed for the UI
-export { eraseQuantileSlider, quantileSliderCallback, attentionThresholdSliderCallback } from './settings';
+export { eraseQuantileSlider, quantileSliderCallback, attentionThresholdSliderCallback, toggleSettingCallback } from './settings';

@@ -119,3 +119,14 @@ export function updateAllQuantileTexts() {
     }
 }
 onSettingsChange.push(updateAllQuantileTexts);
+
+/* Called on settings change and on tick.
+ */
+export function toggleVisibilityInterestingGoods() {
+    if(!settings.autohideUninterestingGoods) return;
+    for(let i = 0; i < getGoodsCount(); i++) {
+        minigame.goodsById[i].hidden = (attentionForStock(i) == 0);
+        minigame.updateGoodStyle(i);
+    }
+}
+onSettingsChange.push(toggleVisibilityInterestingGoods);

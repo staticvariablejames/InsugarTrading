@@ -1,48 +1,52 @@
+import { Page } from 'playwright';
 import { test, expect } from '@playwright/test';
 import { setupCookieClickerPage } from 'cookie-connoisseur';
 
-test.beforeEach(async ({page}) => {
-    page = await setupCookieClickerPage(page, {saveGame: {
-        buildings: {
-            'Farm': {amount:20}, // Max stock = amount + 10*level
-            'Mine': {amount:20},
-            'Factory': {amount:20},
-            'Bank': {
-                level: 1,
-                amount: 10, // Max stock = 20
-                minigame: {
-                    goods: {
-                        /* Under TriangularDistribution,
-                         * value = 50+id is 50% quantile (median),
-                         * value = 75+id is 87.5% quantile (highest octile),
-                         * value = 25+id is 12.5% quantile (lowest octile).
-                         */
-                        'CRL': {val: 50+0, stock: 20}, // maxed-out stock
-                        'CHC': {val: 75+1, stock: 20},
-                        'BTR': {val: 25+2, stock: 20},
-                        'SUG': {val: 50+3, stock: 0}, // empty stock
-                        'NUT': {val: 75+4, stock: 0},
-                        'SLT': {val: 25+5, stock: 0},
-                        'VNL': {val: 50+6, stock: 10}, // half-empty
-                        'EGG': {val: 75+7, stock: 10},
-                        'CNM': {val: 25+8, stock: 10},
-                    },
+const saveGame = { // Default save game for these tests
+    buildings: {
+        'Farm': {amount:20}, // Max stock = amount + 10*level
+        'Mine': {amount:20},
+        'Factory': {amount:20},
+        'Bank': {
+            level: 1,
+            amount: 10, // Max stock = 20
+            minigame: {
+                goods: {
+                    /* Under TriangularDistribution,
+                     * value = 50+id is 50% quantile (median),
+                     * value = 75+id is 87.5% quantile (highest octile),
+                     * value = 25+id is 12.5% quantile (lowest octile).
+                     */
+                    'CRL': {val: 50+0, stock: 20, d: 0}, // maxed-out stock
+                    'CHC': {val: 75+1, stock: 20},
+                    'BTR': {val: 25+2, stock: 20},
+                    'SUG': {val: 50+3, stock: 0}, // empty stock
+                    'NUT': {val: 75+4, stock: 0},
+                    'SLT': {val: 25+5, stock: 0},
+                    'VNL': {val: 50+6, stock: 10}, // half-empty
+                    'EGG': {val: 75+7, stock: 10},
+                    'CNM': {val: 25+8, stock: 10},
                 },
             },
-            'Temple': {amount:20},
-            'Wizard tower': {amount:20},
-            'Shipment': {amount:20},
-            'Alchemy lab': {amount:20},
-            'Portal': {amount:20},
         },
-        modSaveData: {
-            "Insugar Trading": {
-                settings: {
-                    attentionThreshold: 0.5,
-                }
+        'Temple': {amount:20},
+        'Wizard tower': {amount:20},
+        'Shipment': {amount:20},
+        'Alchemy lab': {amount:20},
+        'Portal': {amount:20},
+    },
+    modSaveData: {
+        "Insugar Trading": {
+            settings: {
+                attentionThreshold: 0.5,
+                autohideUninterestingGoods: false,
             }
         }
-    }});
+    }
+};
+
+async function setup(page: Page, saveGame: Object) {
+    await setupCookieClickerPage(page, {saveGame});
 
     await page.evaluate(() => Game.LoadMod('https://staticvariablejames.github.io/InsugarTrading/InsugarTrading.js'));
     await page.waitForFunction(() => Game.isMinigameReady(Game.Objects['Bank']));
@@ -50,10 +54,11 @@ test.beforeEach(async ({page}) => {
     await page.waitForFunction(() => window.InsugarTrading.isDataAvailable(1, 0, 0));
     await page.evaluate(() => window.InsugarTrading.makeTestingTriangularDistribution());
     await page.evaluate(() => window.InsugarTrading.updateAllQuantileTexts());
-});
+}
 
 test('Attention estimates are correct', async ({page}) => {
-    await page.pause();
+    await setup(page, saveGame);
+
     // Test maxed-out stock
     expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(0))).toBeCloseTo(0, 10);
     expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(1))).toBeCloseTo(0.75, 10);
@@ -95,6 +100,8 @@ test('Attention estimates are correct', async ({page}) => {
 });
 
 test('Attention estimates update graphically', async ({page}) => {
+    await setup(page, saveGame);
+
     let quantileDisplayLocator = await page.locator('id=quantile-1');
     await expect(quantileDisplayLocator).toHaveCSS('font-weight', '700'); // 700 is bold
 
@@ -113,4 +120,76 @@ test('Attention estimates update graphically', async ({page}) => {
 
     await setThreshold('76');
     await expect(quantileDisplayLocator).toHaveCSS('font-weight', '400'); // 400 is normal
+});
+
+test('Uninteresting goods are automatically hidden', async ({page}) => {
+    let save = structuredClone(saveGame);
+    save.modSaveData['Insugar Trading'].settings.autohideUninterestingGoods = true;
+    save.buildings['Bank'].minigame.goods['CRL'].val = 51; // barely interesting stock
+    save.buildings['Bank'].minigame.goods['CRL'].d = -100; // Falls to oblivion
+    await setup(page, save);
+
+    expect(await page.evaluate(() => Game.Objects['Bank'].minigame.goodsById[0].hidden)).toBe(false);
+    await expect(page.locator('id=bankGood-0')).not.toContainClass('bankHidden');
+    expect(await page.evaluate(() => Game.Objects['Bank'].minigame.goodsById[1].hidden)).toBe(false);
+    await expect(page.locator('id=bankGood-1')).not.toContainClass('bankHidden');
+    expect(await page.evaluate(() => Game.Objects['Bank'].minigame.goodsById[2].hidden)).toBe(true);
+    await expect(page.locator('id=bankGood-2')).toContainClass('bankHidden');
+
+    // Toggle
+    await page.click('text=Options');
+    await page.click('id=InsugarTradingautohideUninterestingGoodsButton');
+    // Toggling disables the class changing, but existing visibility states should not change
+    expect(await page.evaluate(() => Game.Objects['Bank'].minigame.goodsById[0].hidden)).toBe(false);
+    await expect(page.locator('id=bankGood-0')).not.toContainClass('bankHidden');
+    expect(await page.evaluate(() => Game.Objects['Bank'].minigame.goodsById[1].hidden)).toBe(false);
+    await expect(page.locator('id=bankGood-1')).not.toContainClass('bankHidden');
+    expect(await page.evaluate(() => Game.Objects['Bank'].minigame.goodsById[2].hidden)).toBe(true);
+    await expect(page.locator('id=bankGood-2')).toContainClass('bankHidden');
+
+    // Manually change the visibility states, then toggle back. Should change visibility for the stocks
+    await page.evaluate(() => {
+        Game.Objects['Bank'].minigame.goodsById[0].hidden = true;
+        Game.Objects['Bank'].minigame.goodsById[1].hidden = true;
+        Game.Objects['Bank'].minigame.goodsById[2].hidden = false;
+        Game.Objects['Bank'].minigame.updateGoodStyle(0);
+        Game.Objects['Bank'].minigame.updateGoodStyle(1);
+        Game.Objects['Bank'].minigame.updateGoodStyle(2);
+    });
+    await page.click('id=InsugarTradingautohideUninterestingGoodsButton');
+    expect(await page.evaluate(() => Game.Objects['Bank'].minigame.goodsById[0].hidden)).toBe(false);
+    await expect(page.locator('id=bankGood-0')).not.toContainClass('bankHidden');
+    expect(await page.evaluate(() => Game.Objects['Bank'].minigame.goodsById[1].hidden)).toBe(false);
+    await expect(page.locator('id=bankGood-1')).not.toContainClass('bankHidden');
+    expect(await page.evaluate(() => Game.Objects['Bank'].minigame.goodsById[2].hidden)).toBe(true);
+    await expect(page.locator('id=bankGood-2')).toContainClass('bankHidden');
+
+    // Tick
+    await page.evaluate(() => {
+        Math.seedrandom("test");
+        Game.Objects['Bank'].minigame.tick();
+    });
+    expect(await page.evaluate(() => Game.Objects['Bank'].minigame.goodsById[0].hidden)).toBe(true);
+    await expect(page.locator('id=bankGood-0')).toContainClass('bankHidden');
+});
+
+test('Uninteresting goods are not automatically hidden by default', async ({page}) => {
+    await setup(page, saveGame);
+    let save = structuredClone(saveGame);
+    save.modSaveData['Insugar Trading'].settings.autohideUninterestingGoods = true;
+    save.buildings['Bank'].minigame.goods['CRL'].val = 51; // barely interesting stock
+    save.buildings['Bank'].minigame.goods['CRL'].d = -100; // Falls to oblivion
+    await setup(page, save);
+
+    expect(await page.evaluate(() => window.InsugarTrading.settings.autohideUninterestingGoods)).toBe(false);
+    expect(await page.evaluate(() => Game.Objects['Bank'].minigame.goodsById[2].hidden)).toBe(false);
+    await expect(page.locator('id=bankGood-2')).not.toContainClass('bankHidden');
+
+    // Tick
+    await page.evaluate(() => {
+        Math.seedrandom("test");
+        Game.Objects['Bank'].minigame.tick();
+    });
+    expect(await page.evaluate(() => Game.Objects['Bank'].minigame.goodsById[2].hidden)).toBe(false);
+    await expect(page.locator('id=bankGood-2')).not.toContainClass('bankHidden');
 });
