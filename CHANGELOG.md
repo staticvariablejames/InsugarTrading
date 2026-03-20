@@ -4,6 +4,8 @@
 - Added: datasets for PBL (cortex bakers) and YOU (you).
 - **Breaking change**: The mod was updated to take the influence from Krumblor's auras into account,
     so many functions' signatures were updated accordingly.
+- **Breaking change**: `InsugarTrading.quantile` renamed to `InsugarTrading.valueOfQuantile`
+    and `InsugarTrading.inverseQuantile` renamed to `InsugarTrading.quantileOfValue`.
 - **Breaking change**: `InsugarTrading.isDataAvailable` no longer fetches a dataset
     if data is unavailable.
 - Changed: The threshold for when a good is highlighted is now higher

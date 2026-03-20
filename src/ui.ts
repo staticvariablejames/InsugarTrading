@@ -2,7 +2,7 @@
  * Note that the Options submenu is maintained in settings.ts.
  */
 
-import { fetchDataset, inverseQuantile, isDataAvailable } from './dataset';
+import { fetchDataset, quantileOfValue, isDataAvailable } from './dataset';
 import { settings, onSettingsChange } from './settings';
 import { getBankLevel, getGoodsCount, getDragonBoost, minigame } from './util';
 import { SVGHistogram } from './visualization';
@@ -60,7 +60,7 @@ export function attentionForStock(stockId: number) {
     let value = good.val;
     let canBuy = good.stock < minigame.getGoodMaxStock(good);
     let canSell = good.stock > 0;
-    let quantile = inverseQuantile(getBankLevel(), getDragonBoost(), stockId, value)!;
+    let quantile = quantileOfValue(getBankLevel(), getDragonBoost(), stockId, value)!;
     return attentionForQuantile(quantile, canBuy, canSell);
 }
 
@@ -79,7 +79,7 @@ export function updateQuantileText(id: number) {
     } else {
         let good = minigame.goodsById[id];
         let value = good.val;
-        let q = inverseQuantile(lvl, boost, id, value)!;
+        let q = quantileOfValue(lvl, boost, id, value)!;
         div.innerHTML = (Math.floor(10000*q)/100) + '%';
 
         let att = attentionForStock(id);

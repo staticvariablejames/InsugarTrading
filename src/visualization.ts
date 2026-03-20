@@ -1,7 +1,7 @@
 /* Functions to produce the visualizations for the dataset
  */
 
-import { data, isDataAvailable, partialSums, quantile, rawFrequency } from './dataset';
+import { data, isDataAvailable, partialSums, valueOfQuantile, rawFrequency } from './dataset';
 import { minigame } from './util';
 import { settings } from './settings';
 
@@ -43,7 +43,7 @@ export function SVGHistogram(bankLevel: number, dragonBoost: number, goodId: num
     } else {
         upperPriceBound = 0;
         for(let id in data[bankLevel][dragonBoost]) {
-            let bound = quantile(bankLevel, dragonBoost, Number(id), quantileThreshold)!;
+            let bound = valueOfQuantile(bankLevel, dragonBoost, Number(id), quantileThreshold)!;
             upperPriceBound = Math.max(upperPriceBound, bound);
         }
     }
@@ -79,7 +79,7 @@ export function SVGHistogram(bankLevel: number, dragonBoost: number, goodId: num
 
     // Draw each additional line
     for(let q of options.additionalLines) {
-        let value = quantile(bankLevel, dragonBoost, goodId, q)!;
+        let value = valueOfQuantile(bankLevel, dragonBoost, goodId, q)!;
         let x = value/upperPriceBound * graphWidth + axesMargin;
         let frequency = rawFrequency(bankLevel, dragonBoost, goodId, Math.floor(10*value))!;
         let y = (1 - frequency/density)*graphHeight;

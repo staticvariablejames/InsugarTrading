@@ -36,9 +36,9 @@ async function makeSummary(bankLevel: number, aura1: number, aura2: number) {
             return '| ' + Game.Objects['Bank'].minigame.goodsById[i].symbol + ' | ' +
                 Math.floor(window.InsugarTrading.averagePrice(bankLevel, boost, i)! * 100)/100 + ' | ' +
                 min/10 + ' | ' +
-                Math.floor(window.InsugarTrading.quantile(bankLevel, boost, i, 0.25)! * 100)/100 + ' | ' +
-                Math.floor(window.InsugarTrading.quantile(bankLevel, boost, i, 0.50)! * 100)/100 + ' | ' +
-                Math.floor(window.InsugarTrading.quantile(bankLevel, boost, i, 0.75)! * 100)/100 + ' | ' +
+                Math.floor(window.InsugarTrading.valueOfQuantile(bankLevel, boost, i, 0.25)! * 100)/100 + ' | ' +
+                Math.floor(window.InsugarTrading.valueOfQuantile(bankLevel, boost, i, 0.50)! * 100)/100 + ' | ' +
+                Math.floor(window.InsugarTrading.valueOfQuantile(bankLevel, boost, i, 0.75)! * 100)/100 + ' | ' +
                 max/10 + ' | ';
         }, {i}));
     }

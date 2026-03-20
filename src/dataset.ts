@@ -131,16 +131,22 @@ function computePartialSums(lvl: number) {
 }
 onDatasetLoad.push(computePartialSums);
 
-
-/* Returns a value such that the given fraction of the values in the histogram are smaller than it
+/* The quantile function.
+ * Returns a value such that the given fraction of the values in the histogram are smaller than it
  * and 1-fraction of the values in the histogram are higher than it.
+ *
+ * For example, `valueOfQuantile(1, 0, 0, 0.5)` (the fraction being 0.5)
+ * is the median value attained by the first good with no dragon auras and bank level 1,
+ * and `valueOfQuantile(1, 0, 0, 0.75)` is the upper quartile.
+ * This function is an inverse of the cumulative distribution function (`quantileOfValue` below).
+ *
  * A linear approximation is used inside each bin of the histogram.
  *
  * If more than one value is valid, the largest one is returned.
  *
  * If there is no available data, it returns null.
  */
-export function quantile(bankLevel: number, dragonBoost: number, goodId: number, fraction: number) {
+export function valueOfQuantile(bankLevel: number, dragonBoost: number, goodId: number, fraction: number) {
     if(!isDataAvailable(bankLevel, dragonBoost, goodId)) return null;
 
     if(fraction < 0) return -Infinity;
@@ -175,14 +181,17 @@ export function quantile(bankLevel: number, dragonBoost: number, goodId: number,
     return knownQuantile + estimatedQuantile;
 }
 
-/* Returns the proportion of values in the histogram for goodId
- * which are smaller than the given value.
+/* The cumulative distribution function (CDF).
+ * Returns the proportion of values in the histogram which are smaller than the given value.
  * The result is a value between 0 and 1 (inclusive).
+ *
+ * This function is an inverse of the quantile function (`valueOfQuantile` above).
+ *
  * A linear approximation is used inside each bin of the histogram.
  *
  * If there is no available data, it returns null.
  */
-export function inverseQuantile(bankLevel: number, dragonBoost: number, goodId: number, targetValue: number) {
+export function quantileOfValue(bankLevel: number, dragonBoost: number, goodId: number, targetValue: number) {
     if(!isDataAvailable(bankLevel, dragonBoost, goodId)) return null;
 
     let value = 10 * targetValue; // The histogram works in increments of 0.1
