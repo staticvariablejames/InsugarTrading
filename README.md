@@ -9,10 +9,10 @@ This is an add-on for [Cookie Clicker](https://orteil.dashnet.org/cookieclicker/
 that helps analyze the Stock Market minigame.
 
 This add-on contains two parts:
-the [dataset](#dataset), which is a histogram of the good values in the stock market,
+the [dataset](#dataset), which is a histogram of the goods values in the stock market,
 collected in a simulation of 1000 years of the market ups and downs;
 and the [statistics display](#statistics),
-which shows the histogram and the quantiles of the current stock values.
+which shows the histogram and the quantiles of the current goods values.
 
 
 Dataset
@@ -109,7 +109,7 @@ The quantiles can be customized in the settings.
 ![Quantile bar](test/visualization.test.ts-snapshots/bankGoodPanelWithQuantileBar-firefox-linux.png)
 
 Second,
-it adds a bar between the current good value and the amount that stock owned.
+it adds a bar between the current good value and the amount owned of that good.
 It displays the quantile of that good value,
 compared to the dataset.
 For example,

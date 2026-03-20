@@ -17,7 +17,7 @@ type SVGHistogramOptions = {
  * If currentValue is present, generates an orange vertical line at that value.
  * If additionalLines is a list of numbers between 0 and 1;
  *  each number is considered a quantile and one vertical line is generated for each.
- * If displayName is true, the name of the stock is displayed in the top right corner.
+ * If displayName is true, the name of the good is displayed in the top right corner.
  * If forceUpperBound is present, the histogram price axis will range from 0 to forceUpperBound;
  *  otherwise, the upper bound will be the highest 99.9th percentile of all goods.
  *  This simplifies visually comparing two goods under the same bank level and dragon boost.
@@ -51,7 +51,7 @@ export function SVGHistogram(bankLevel: number, dragonBoost: number, goodId: num
 
     let entryCount = data[bankLevel][dragonBoost][goodId].length;
     let density = partialSums[bankLevel][dragonBoost][goodId][entryCount]/100;
-    /* This way, a stock that is uniformly distributed over a range of $10
+    /* This way, a good that is uniformly distributed over a range of $10
      * would form a rectangle whose height is the entire range. */
 
     // Draw axes
@@ -98,7 +98,7 @@ export function SVGHistogram(bankLevel: number, dragonBoost: number, goodId: num
         str += `<line x1="${x}" y1="${y}" x2="${x}" y2="${graphHeight}" stroke="orange" stroke-width="3px"/>`;
     }
 
-    // Draw the name of the stock in the top right corner
+    // Draw the name of the good in the top right corner
     if(options.displayName) {
         str += `<text x="${graphWidth+axesMargin}" y="${axesMargin}" text-anchor="end"` +
             ` dominant-baseline="hanging" fill="white" font-size="x-large">` +
@@ -110,7 +110,7 @@ export function SVGHistogram(bankLevel: number, dragonBoost: number, goodId: num
     return str;
 }
 
-// Constructs a large image containing the histograms for all stocks
+// Constructs a large image containing the histograms for all goods
 export function allSVGHistograms(bankLevel: number, dragonBoost: number, forceUpperBound: number) {
     let additionalLines = settings.quantilesToDisplay;
     let displayName = true;

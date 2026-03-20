@@ -60,43 +60,43 @@ test('Attention estimates are correct', async ({page}) => {
     await setup(page, saveGame);
 
     // Test maxed-out stock
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(0))).toBeCloseTo(0, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(1))).toBeCloseTo(0.75, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(2))).toBeCloseTo(0, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(0))).toBeCloseTo(0, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(1))).toBeCloseTo(0.75, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(2))).toBeCloseTo(0, 10);
 
     // Test empty stock
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(3))).toBeCloseTo(0, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(4))).toBeCloseTo(0, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(5))).toBeCloseTo(0.75, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(3))).toBeCloseTo(0, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(4))).toBeCloseTo(0, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(5))).toBeCloseTo(0.75, 10);
 
     // Test half-full stock
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(6))).toBeCloseTo(0, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(7))).toBeCloseTo(0.75, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(8))).toBeCloseTo(0.75, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(6))).toBeCloseTo(0, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(7))).toBeCloseTo(0.75, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(8))).toBeCloseTo(0.75, 10);
 
     // Test after raising the threshold value
     await page.evaluate(() => window.InsugarTrading.settings.attentionThreshold = 0.75);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(0))).toBeCloseTo(0, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(1))).toBeCloseTo(0.5, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(2))).toBeCloseTo(0, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(3))).toBeCloseTo(0, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(4))).toBeCloseTo(0, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(5))).toBeCloseTo(0.5, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(6))).toBeCloseTo(0, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(7))).toBeCloseTo(0.5, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(8))).toBeCloseTo(0.5, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(0))).toBeCloseTo(0, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(1))).toBeCloseTo(0.5, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(2))).toBeCloseTo(0, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(3))).toBeCloseTo(0, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(4))).toBeCloseTo(0, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(5))).toBeCloseTo(0.5, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(6))).toBeCloseTo(0, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(7))).toBeCloseTo(0.5, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(8))).toBeCloseTo(0.5, 10);
 
     // Test after lowering the threshold value
     await page.evaluate(() => window.InsugarTrading.settings.attentionThreshold = 0);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(0))).toBeCloseTo(0.5, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(1))).toBeCloseTo(0.875, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(2))).toBeCloseTo(0.125, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(3))).toBeCloseTo(0.5, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(4))).toBeCloseTo(0.125, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(5))).toBeCloseTo(0.875, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(6))).toBeCloseTo(0.5, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(7))).toBeCloseTo(0.875, 10);
-    expect(await page.evaluate(() => window.InsugarTrading.attentionForStock(8))).toBeCloseTo(0.875, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(0))).toBeCloseTo(0.5, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(1))).toBeCloseTo(0.875, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(2))).toBeCloseTo(0.125, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(3))).toBeCloseTo(0.5, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(4))).toBeCloseTo(0.125, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(5))).toBeCloseTo(0.875, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(6))).toBeCloseTo(0.5, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(7))).toBeCloseTo(0.875, 10);
+    expect(await page.evaluate(() => window.InsugarTrading.attentionForGood(8))).toBeCloseTo(0.875, 10);
 });
 
 test('Attention estimates update graphically', async ({page}) => {
@@ -121,7 +121,7 @@ test('Attention estimates update graphically', async ({page}) => {
 test('Uninteresting goods are automatically hidden', async ({page}) => {
     let save = structuredClone(saveGame);
     save.modSaveData['Insugar Trading'].settings.autohideUninterestingGoods = true;
-    save.buildings['Bank'].minigame.goods['CRL'].val = 51; // barely interesting stock
+    save.buildings['Bank'].minigame.goods['CRL'].val = 51; // barely interesting good
     save.buildings['Bank'].minigame.goods['CRL'].d = -100; // Falls to oblivion
     await setup(page, save);
 
@@ -143,7 +143,7 @@ test('Uninteresting goods are automatically hidden', async ({page}) => {
     expect(await page.evaluate(() => Game.Objects['Bank'].minigame.goodsById[2].hidden)).toBe(true);
     await expect(page.locator('id=bankGood-2')).toContainClass('bankHidden');
 
-    // Manually change the visibility states, then toggle back. Should change visibility for the stocks
+    // Manually change the visibility states, then toggle back. Should change visibility for the goods
     await page.evaluate(() => {
         Game.Objects['Bank'].minigame.goodsById[0].hidden = true;
         Game.Objects['Bank'].minigame.goodsById[1].hidden = true;
@@ -173,7 +173,7 @@ test('Uninteresting goods are not automatically hidden by default', async ({page
     await setup(page, saveGame);
     let save = structuredClone(saveGame);
     save.modSaveData['Insugar Trading'].settings.autohideUninterestingGoods = true;
-    save.buildings['Bank'].minigame.goods['CRL'].val = 51; // barely interesting stock
+    save.buildings['Bank'].minigame.goods['CRL'].val = 51; // barely interesting good
     save.buildings['Bank'].minigame.goods['CRL'].d = -100; // Falls to oblivion
     await setup(page, save);
 

@@ -2,7 +2,7 @@
  */
 
 /* The data here is just a histogram:
- * data[bankLvl][dragonBoost][id][value] is the number of times that the id-th stock
+ * data[bankLvl][dragonBoost][id][value] is the number of times that the id-th good
  * (as listed by Game.Objects['Bank'].goodsById)
  * had its price between value/10 (inclusive) and value/10+1 (exclusive),
  * while the Bank building had the level bankLvl

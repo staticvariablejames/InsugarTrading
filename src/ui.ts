@@ -7,7 +7,7 @@ import { settings, onSettingsChange } from './settings';
 import { getBankLevel, getGoodsCount, getDragonBoost, minigame } from './util';
 import { SVGHistogram } from './visualization';
 
-/* Creates a new row in each of the good-displaying boxes, right above the stock count.
+/* Creates a new row in each of the good-displaying boxes, right above the stock.
  * Each box has the text "Quantile: " followed by a div with id 'quantile-0', 'quantile-1' etc.
  * Since this method is called precisely once after the minigame loads,
  * the ids are reliable and are used e.g. by updateQuantileText.
@@ -15,12 +15,12 @@ import { SVGHistogram } from './visualization';
 export function createQuantileRows() {
     for(let i = 0; i < getGoodsCount(); i++) {
         let upperBox = document.getElementById('bankGood-' + i)!.firstChild!;
-        let stockCounterDiv = document.getElementById('bankGood-' + i + '-stockBox')!;
-        let quantileDiv = upperBox.insertBefore(document.createElement("div"), stockCounterDiv);
+        let stockBoxDiv = document.getElementById('bankGood-' + i + '-stockBox')!;
+        let quantileDiv = upperBox.insertBefore(document.createElement("div"), stockBoxDiv);
 
         // Copy the style from the other div, because assigning quantileDiv.style don't work
-        for(let key of stockCounterDiv.style) {
-            (quantileDiv.style as any)[key] = (stockCounterDiv.style as any)[key];
+        for(let key of stockBoxDiv.style) {
+            (quantileDiv.style as any)[key] = (stockBoxDiv.style as any)[key];
         }
 
         quantileDiv.innerHTML = 'Quantile: <div id="quantile-' + i + '" ' +
@@ -37,30 +37,30 @@ export function createQuantileRows() {
  *  or if you have a lot of that good and is very expensive.
  *
  * For intermediate values, if canSell,
- * this function returns 0 if stockQuantile is below settings.attentionThreshold,
+ * this function returns 0 if goodQuantile is below settings.attentionThreshold,
  * and interpolates linearly between settings.attentionThreshold and 1.
  * The opposite happens if canBuy.
  * If both canBuy and canSell we return the maximum of the two directions.
  */
-export function attentionForQuantile(stockQuantile: number, canBuy: boolean, canSell: boolean) {
+export function attentionForQuantile(goodQuantile: number, canBuy: boolean, canSell: boolean) {
     let t = settings.attentionThreshold;
-    let attentionIfSelling = (stockQuantile - t)/(1-t);
+    let attentionIfSelling = (goodQuantile - t)/(1-t);
     if(!(attentionIfSelling > 0)) attentionIfSelling = 0; // weird conditional also handles NaN
     if(!canSell) attentionIfSelling = 0;
-    let attentionIfBuying = (1-t - stockQuantile)/(1-t);
+    let attentionIfBuying = (1-t - goodQuantile)/(1-t);
     if(!(attentionIfBuying > 0)) attentionIfBuying = 0;
     if(!canBuy) attentionIfBuying = 0;
     return Math.max(attentionIfBuying, attentionIfSelling);
 }
 
-/* Returns the attentionForQuantile of the given stock.
+/* Returns the attentionForQuantile of the given good.
  */
-export function attentionForStock(stockId: number) {
-    let good = minigame.goodsById[stockId];
+export function attentionForGood(goodId: number) {
+    let good = minigame.goodsById[goodId];
     let value = good.val;
     let canBuy = good.stock < minigame.getGoodMaxStock(good);
     let canSell = good.stock > 0;
-    let quantile = quantileOfValue(getBankLevel(), getDragonBoost(), stockId, value)!;
+    let quantile = quantileOfValue(getBankLevel(), getDragonBoost(), goodId, value)!;
     return attentionForQuantile(quantile, canBuy, canSell);
 }
 
@@ -82,7 +82,7 @@ export function updateQuantileText(id: number) {
         let q = quantileOfValue(lvl, boost, id, value)!;
         div.innerHTML = (Math.floor(10000*q)/100) + '%';
 
-        let att = attentionForStock(id);
+        let att = attentionForGood(id);
         div.style.fontWeight = (att >= 0.5 ? 'bold' : '');
 
         // Makeshift color interpolation from grey (which is div.parentElement.style.color) to orange
@@ -125,7 +125,7 @@ onSettingsChange.push(updateAllQuantileTexts);
 export function toggleVisibilityInterestingGoods() {
     if(!settings.autohideUninterestingGoods) return;
     for(let i = 0; i < getGoodsCount(); i++) {
-        minigame.goodsById[i].hidden = (attentionForStock(i) == 0);
+        minigame.goodsById[i].hidden = (attentionForGood(i) == 0);
         minigame.updateGoodStyle(i);
     }
 }

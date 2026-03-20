@@ -84,7 +84,7 @@ export function customOptionsMenu() {
         onclick="InsugarTrading.toggleSettingCallback('autohideUninterestingGoods', 'Autohide goods')">
             Autohide goods ${onoff? 'ON': 'OFF'}
         </a>
-        <label>On each tick, automatically hide stocks below the attention threshold</label>
+        <label>On each tick, automatically hide goods below the attention threshold</label>
         </div>`;
 
     for(let i = 0; i < settings.quantilesToDisplay.length; i++) {

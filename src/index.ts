@@ -9,7 +9,7 @@ export { data, valueOfQuantile, quantileOfValue, averagePrice, onDatasetLoad, is
 
 // Mostly testing
 export { partialSums, fetchDataset } from './dataset';
-export { updateAllQuantileTexts, attentionForQuantile, attentionForStock } from './ui';
+export { updateAllQuantileTexts, attentionForQuantile, attentionForGood } from './ui';
 
 // Needed for the UI
 export { eraseQuantileSlider, quantileSliderCallback, attentionThresholdSliderCallback, toggleSettingCallback } from './settings';
