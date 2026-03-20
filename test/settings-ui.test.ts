@@ -52,3 +52,25 @@ test('Quantiles can be removed', async ({page}) => {
         await page.evaluate('InsugarTrading.settings.quantilesToDisplay')
     ).toEqual([0.25, 0.5, 0.75, 0.5]);
 });
+
+test('Attention threshold can be changed', async ({page}) => {
+    expect(await page.evaluate(() => window.InsugarTrading.settings.attentionThreshold)).toEqual(0.75);
+
+    await page.getByText('Options').click();
+    await page.locator('#InsugarTradingAttentionThresholdSlider').fill('50');
+    expect(await page.evaluate(() => window.InsugarTrading.settings.attentionThreshold)).toEqual(0.5);
+
+    await page.locator('#InsugarTradingAttentionThresholdSlider').fill('15');
+    expect(await page.evaluate(() => window.InsugarTrading.settings.attentionThreshold)).toEqual(0.15);
+});
+
+test('Goods autohiding can be toggled', async ({page}) => {
+    expect(await page.evaluate(() => window.InsugarTrading.settings.autohideUninterestingGoods)).toEqual(false);
+
+    await page.getByText('Options').click();
+    await page.getByText('Autohide goods OFF').click();
+    expect(await page.evaluate(() => window.InsugarTrading.settings.autohideUninterestingGoods)).toEqual(true);
+
+    await page.getByText('Autohide goods ON').click();
+    expect(await page.evaluate(() => window.InsugarTrading.settings.autohideUninterestingGoods)).toEqual(false);
+});
