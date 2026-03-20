@@ -24,5 +24,5 @@ test('Some functions are part of the public API', async ({ page }) => {
     expect(await page.evaluate('"settings" in InsugarTrading')).toBe(true);
     expect(await page.evaluate('"quantilesToDisplay" in InsugarTrading.settings')).toBe(true);
     expect(await page.evaluate('typeof InsugarTrading.quantile')).toEqual('function');
-    expect(await page.innerText('#quantile-5')).toMatch(/\d*.\d*%/);
+    await expect(page.locator('#quantile-5')).toHaveText(/\d*.\d*%/);
 });

@@ -27,19 +27,15 @@ test.beforeEach(async ({page}) => {
     await page.evaluate(() => Game.LoadMod('https://staticvariablejames.github.io/InsugarTrading/InsugarTrading.js'));
     await page.waitForFunction(() => Game.isMinigameReady(Game.Objects['Bank']));
     await page.waitForFunction(() => 'Insugar Trading' in Game.mods);
-    await page.waitForFunction('0.1 in InsugarTrading.data[1]');
+    await page.waitForFunction(() => window.InsugarTrading.isDataAvailable(1, 0.1, 0));
 });
 
 test('Creates the quantile row', async ({page}) => {
-    await page.evaluate(() => Game.Objects.Bank.minigame.secondsPerTick = 56879);
-    await page.pause();
-    let bankGoodPanel = await page.$('#bankGood-3');
-    expect(await bankGoodPanel!.screenshot()).toMatchSnapshot('bankGoodPanelWithQuantileBar.png');
+    expect(await page.locator('#bankGood-3').screenshot()).toMatchSnapshot('bankGoodPanelWithQuantileBar.png');
 });
 
 test('Highlights goods away from the median', async ({page}) => {
-    let bankGoodPanel = await page.$('#bankGood-4');
-    expect(await bankGoodPanel!.screenshot()).toMatchSnapshot('bankGoodPanelWithHighlightedQuantileBar.png');
+    expect(await page.locator('#bankGood-4').screenshot()).toMatchSnapshot('bankGoodPanelWithHighlightedQuantileBar.png');
 });
 
 test('Displays the histogram in the tooltip', async ({page}) => {
@@ -53,7 +49,7 @@ test('Displays the histogram in the tooltip', async ({page}) => {
     await page.evaluate(() => CConnoisseur.clearNewsTickerText());
     await page.evaluate(() => Game.CloseNotes());
 
-    await page.hover('#bankGood-3');
-    let tooltipHandle = await page.$('#tooltip');
+    await page.locator('#bankGood-3').hover();
+    let tooltipHandle = await page.locator('#tooltip');
     expect(await tooltipHandle!.screenshot()).toMatchSnapshot('bankGoodTooltip.png');
 });

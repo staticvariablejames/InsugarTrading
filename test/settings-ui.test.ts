@@ -12,45 +12,45 @@ test.beforeEach(async ({page}) => {
 
 test('Quantiles can be changed', async ({page}) => {
     expect(
-        await page.evaluate('InsugarTrading.settings.quantilesToDisplay')
+        await page.evaluate(() => window.InsugarTrading.settings.quantilesToDisplay)
     ).toEqual([0.25, 0.5, 0.75]);
 
-    await page.click('text=Options');
-    await page.fill('id=InsugarTradingQuantileSlider0', '15');
+    await page.getByText('Options').click();
+    await page.locator('#InsugarTradingQuantileSlider0').fill('15');
     expect(
-        await page.evaluate('InsugarTrading.settings.quantilesToDisplay')
+        await page.evaluate(() => window.InsugarTrading.settings.quantilesToDisplay)
     ).toEqual([0.15, 0.5, 0.75]);
 
-    await page.fill('id=InsugarTradingQuantileSlider1', '5');
+    await page.locator('#InsugarTradingQuantileSlider1').fill('5');
     expect(
-        await page.evaluate('InsugarTrading.settings.quantilesToDisplay')
+        await page.evaluate(() => window.InsugarTrading.settings.quantilesToDisplay)
     ).toEqual([0.15, 0.05, 0.75]);
 });
 
 test('Quantiles can be created', async ({page}) => {
-    await page.click('text=Options');
-    await page.click('text="Add quantile"');
+    await page.getByText('Options').click();
+    await page.getByText('Add quantile').click();
     expect(
-        await page.evaluate('InsugarTrading.settings.quantilesToDisplay')
+        await page.evaluate(() => window.InsugarTrading.settings.quantilesToDisplay)
     ).toEqual([0.25, 0.5, 0.75, 0.5]);
 
-    await page.click('text="Add quantile"');
+    await page.getByText('Add quantile').click();
     expect(
-        await page.evaluate('InsugarTrading.settings.quantilesToDisplay')
+        await page.evaluate(() => window.InsugarTrading.settings.quantilesToDisplay)
     ).toEqual([0.25, 0.5, 0.75, 0.5, 0.5]);
 
-    await page.fill('id=InsugarTradingQuantileSlider3', '95');
+    await page.locator('#InsugarTradingQuantileSlider3').fill('95');
     expect(
-        await page.evaluate('InsugarTrading.settings.quantilesToDisplay')
+        await page.evaluate(() => window.InsugarTrading.settings.quantilesToDisplay)
     ).toEqual([0.25, 0.5, 0.75, 0.95, 0.5]);
 });
 
 test('Quantiles can be removed', async ({page}) => {
-    await page.click('text=Options');
-    await page.click('text="Add quantile"');
+    await page.getByText('Options').click();
+    await page.getByText('Remove').first().click();
     expect(
-        await page.evaluate('InsugarTrading.settings.quantilesToDisplay')
-    ).toEqual([0.25, 0.5, 0.75, 0.5]);
+        await page.evaluate(() => window.InsugarTrading.settings.quantilesToDisplay)
+    ).toEqual([0.5, 0.75]);
 });
 
 test('Attention threshold can be changed', async ({page}) => {

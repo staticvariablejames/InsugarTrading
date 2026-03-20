@@ -105,12 +105,8 @@ test('Attention estimates update graphically', async ({page}) => {
     let quantileDisplayLocator = await page.locator('id=quantile-1');
     await expect(quantileDisplayLocator).toHaveCSS('font-weight', '700'); // 700 is bold
 
-    async function setThreshold(str: string) {
-        await page.click('text=Options');
-        await page.fill('id=InsugarTradingAttentionThresholdSlider', str);
-        await page.click('text=Options');
-    }
-    await setThreshold('75');
+    await page.getByText('Options').click();
+    await page.locator('#InsugarTradingAttentionThresholdSlider').fill('75');
 
     // Check setter works
     expect(await page.evaluate(() => window.InsugarTrading.settings.attentionThreshold)).toBe(0.75);
@@ -118,7 +114,7 @@ test('Attention estimates update graphically', async ({page}) => {
     // Check font-weight is still bold
     await expect(quantileDisplayLocator).toHaveCSS('font-weight', '700');
 
-    await setThreshold('76');
+    await page.locator('#InsugarTradingAttentionThresholdSlider').fill('76');
     await expect(quantileDisplayLocator).toHaveCSS('font-weight', '400'); // 400 is normal
 });
 
@@ -137,8 +133,8 @@ test('Uninteresting goods are automatically hidden', async ({page}) => {
     await expect(page.locator('id=bankGood-2')).toContainClass('bankHidden');
 
     // Toggle
-    await page.click('text=Options');
-    await page.click('id=InsugarTradingautohideUninterestingGoodsButton');
+    await page.getByText('Options').click();
+    await page.getByText('Autohide goods ON').click();
     // Toggling disables the class changing, but existing visibility states should not change
     expect(await page.evaluate(() => Game.Objects['Bank'].minigame.goodsById[0].hidden)).toBe(false);
     await expect(page.locator('id=bankGood-0')).not.toContainClass('bankHidden');
@@ -156,7 +152,7 @@ test('Uninteresting goods are automatically hidden', async ({page}) => {
         Game.Objects['Bank'].minigame.updateGoodStyle(1);
         Game.Objects['Bank'].minigame.updateGoodStyle(2);
     });
-    await page.click('id=InsugarTradingautohideUninterestingGoodsButton');
+    await page.getByText('Autohide goods OFF').click();
     expect(await page.evaluate(() => Game.Objects['Bank'].minigame.goodsById[0].hidden)).toBe(false);
     await expect(page.locator('id=bankGood-0')).not.toContainClass('bankHidden');
     expect(await page.evaluate(() => Game.Objects['Bank'].minigame.goodsById[1].hidden)).toBe(false);

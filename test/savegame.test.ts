@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { settings } from '../src/settings';
 import { setupCookieClickerPage, CCSave } from 'cookie-connoisseur';
 import { version } from '../package.json';
 
@@ -12,10 +13,7 @@ test('Settings are saved', async ({page}) => {
     expect('Insugar Trading' in save.modSaveData).toBe(true);
     expect(save.modSaveData['Insugar Trading']).toEqual({
         version: version,
-        settings: {
-            attentionThreshold: 0.75,
-            quantilesToDisplay: [0.25, 0.5, 0.75],
-        },
+        settings, // default settings
     });
 });
 
@@ -26,6 +24,7 @@ test.describe('Settings are parsed', () => {
                 version: version,
                 settings: {
                     attentionThreshold: 0.25,
+                    autohideUninterestingGoods: true,
                     quantilesToDisplay: [0.15, 0.5, 0.75],
                 },
             },
@@ -37,10 +36,12 @@ test.describe('Settings are parsed', () => {
         await page.evaluate(() => Game.LoadMod('https://staticvariablejames.github.io/InsugarTrading/InsugarTrading.js'));
         await page.waitForFunction(() => 'Insugar Trading' in Game.mods);
 
-        let quantiles = await page.evaluate('InsugarTrading.settings.quantilesToDisplay');
-        expect(quantiles).toEqual([0.15, 0.5, 0.75]);
-        let attention = await page.evaluate('InsugarTrading.settings.attentionThreshold');
-        expect(attention).toEqual(0.25);
+        expect(await page.evaluate(() => window.InsugarTrading.settings.attentionThreshold))
+            .toEqual(0.25);
+        expect(await page.evaluate(() => window.InsugarTrading.settings.autohideUninterestingGoods))
+            .toEqual(true);
+        expect(await page.evaluate(() => window.InsugarTrading.settings.quantilesToDisplay))
+            .toEqual([0.15, 0.5, 0.75]);
     });
 
     test('after loading the game', async ({page}) => {
@@ -50,9 +51,11 @@ test.describe('Settings are parsed', () => {
 
         await page.evaluate(s => Game.LoadSave(s), CCSave.toNativeSave(save));
 
-        let quantiles = await page.evaluate('InsugarTrading.settings.quantilesToDisplay');
-        expect(quantiles).toEqual([0.15, 0.5, 0.75]);
-        let attention = await page.evaluate('InsugarTrading.settings.attentionThreshold');
-        expect(attention).toEqual(0.25);
+        expect(await page.evaluate(() => window.InsugarTrading.settings.attentionThreshold))
+            .toEqual(0.25);
+        expect(await page.evaluate(() => window.InsugarTrading.settings.autohideUninterestingGoods))
+            .toEqual(true);
+        expect(await page.evaluate(() => window.InsugarTrading.settings.quantilesToDisplay))
+            .toEqual([0.15, 0.5, 0.75]);
     });
 });
