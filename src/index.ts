@@ -13,3 +13,6 @@ export { updateAllQuantileTexts, attentionForQuantile, attentionForGood } from '
 
 // Needed for the UI
 export { eraseQuantileSlider, quantileSliderCallback, attentionThresholdSliderCallback, toggleSettingCallback } from './settings';
+
+// SVG printing
+export { SVGHistogram } from './visualization';

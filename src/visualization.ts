@@ -3,7 +3,6 @@
 
 import { data, isDataAvailable, partialSums, valueOfQuantile, rawFrequency } from './dataset';
 import { minigame } from './util';
-import { settings } from './settings';
 
 type SVGHistogramOptions = {
     currentValue?: number,
@@ -106,32 +105,6 @@ export function SVGHistogram(bankLevel: number, dragonBoost: number, goodId: num
             '</text>';
     }
 
-    str += '</svg>';
-    return str;
-}
-
-// Constructs a large image containing the histograms for all goods
-export function allSVGHistograms(bankLevel: number, dragonBoost: number, forceUpperBound: number) {
-    let additionalLines = settings.quantilesToDisplay;
-    let displayName = true;
-    let innerWidth = 450, innerHeight = 260;
-    if(additionalLines.length > 0) innerHeight += 35;
-
-    let str = '';
-    str += `<svg width="${4*innerWidth}px" height="${4*innerHeight+40}px">`;
-    str += '<rect width="100%" height="100%" fill="black" />'; // background
-    for(let i = 0; i < 4; i++) {
-        for(let j = 0; j < 4; j++) {
-            let goodId = 4*i+j;
-            str += `<svg width="${innerWidth}px" height="${innerHeight}px" x="${j*innerWidth}px" y="${i*innerHeight}px">`;
-            str += SVGHistogram(bankLevel, dragonBoost, goodId, {displayName, additionalLines, forceUpperBound});
-            str += '</svg>';
-        }
-    }
-    str += `<text x="20px" y="${4*innerHeight+20}px" ` +
-        'dominant-baseline="middle" fill="white" font-size="32px">' +
-        'Bank level ' + bankLevel +
-        '</text>';
     str += '</svg>';
     return str;
 }
