@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.5.0 - 2026-03-21
 - Added: datasets for PBL (cortex bakers) and YOU (you).
 - **Breaking change**: The mod was updated to take the influence from Krumblor's auras into account,
     so many functions' signatures were updated accordingly.
