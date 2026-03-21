@@ -4,16 +4,19 @@
 - Added: datasets for PBL (cortex bakers) and YOU (you).
 - **Breaking change**: The mod was updated to take the influence from Krumblor's auras into account,
     so many functions' signatures were updated accordingly.
+- Changed: The threshold for when a good is highlighted is now higher
+    and can be adjusted in the settings.
+- Added: option to automatically hide non-highlighted goods
 - **Breaking change**: `InsugarTrading.quantile` renamed to `InsugarTrading.valueOfQuantile`
     and `InsugarTrading.inverseQuantile` renamed to `InsugarTrading.quantileOfValue`.
 - **Breaking change**: `InsugarTrading.isDataAvailable` no longer fetches a dataset
     if data is unavailable.
-- Changed: The threshold for when a good is highlighted is now higher
-    and can be adjusted in the settings.
 - Changed: The changelog is now in its own file,
     rather than being part of `README.md`.
 - Changed: The orange bar representing the current value of a good
     now has a minimum height.
+- (internal) Added: Codegen tool to automatically create test cases
+    for [CookieClickerCppTools](https://github.com/staticvariablejames/CookieClickerCppTools).
 
 ## 1.4.0 - 2021-10-01
 - Changed: Several internal changes, but (hopefully) no externally visible ones.
